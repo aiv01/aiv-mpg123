@@ -172,23 +172,39 @@ namespace Aiv.Mpg123
             Dispose(false);
         }
 
-        public void SetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, long value, double fvalue)
+        public void SetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, long value = 0, double fvalue = 0)
         {
-            Errors setParam = NativeMethods.NativeMpg123SetParam(handle, type, (IntPtr)value, fvalue);
+            int setParam = NativeMethods.NativeMpg123SetParam(handle, type, (IntPtr)value, fvalue);
 
-            if (setParam != Errors.OK)
+            if ((Errors)setParam != Errors.OK)
             {
-                throw new ErrorException(setParam);
+                throw new ErrorException((Errors)setParam);
             }
         }
 
-        public void GetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, ref long value, ref double fvalue)
+        public void GetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, ref long value, ref double fValue)
         {
-            Errors getParam = NativeMethods.NativeMpg123GetParam(handle, type, (IntPtr)value, (IntPtr)fvalue);
+            IntPtr paramValue = IntPtr.Zero;
+            double paramFValue = 0;
 
-            if (getParam != Errors.OK)
+            int getParam = NativeMethods.NativeMpg123GetParam(handle, type, ref paramValue, ref paramFValue);
+
+            if ((Errors)getParam != Errors.OK)
             {
-                throw new ErrorException(getParam);
+                throw new ErrorException((Errors)getParam);
+            }
+
+            value = (long)paramValue;
+            fValue = paramFValue;
+        }
+
+        public void Feature([MarshalAs(UnmanagedType.I4)] Mpg123FeatureSet key)
+        {
+            int feature = NativeMethods.NativeMpg123Feature(key);
+
+            if (feature == 0)
+            {
+                throw new Exception("unimplemented functions");
             }
         }
     }

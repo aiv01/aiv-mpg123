@@ -66,7 +66,6 @@ namespace Aiv.Mpg123.Tests
         }
 
         [Test]
-
         public void TestOpenPathInvalid()
         {
             string path = "test.mp3";
@@ -101,20 +100,36 @@ namespace Aiv.Mpg123.Tests
             Assert.That(() => mpg123.Close(), Throws.Nothing);
         }
 
+        [Test]
         public void TestSetParamGetParam()
         {
-            long setValue = 1000;
-            double setFValue = 2000;
+            long setValue = 2;
             long getValue = 0;
             double getFValue = 0;
 
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = dirName + "/bensound-epic.mp3";
 
             Mpg123 mpg123 = new Mpg123();
-            mpg123.SetParam(Mpg123.Mpg123Params.MPG123_DECODE_FRAMES, setValue, setFValue);
-            mpg123.GetParam(Mpg123.Mpg123Params.MPG123_DECODE_FRAMES, ref getValue, ref getFValue);
+            mpg123.Open(path);
 
-            Assert.That(getValue, Is.EqualTo(1000));
-            Assert.That(getFValue, Is.EqualTo(2000));
+            mpg123.SetParam(Mpg123.Mpg123Params.MPG123_DOWNSPEED, setValue);
+            mpg123.GetParam(Mpg123.Mpg123Params.MPG123_DOWNSPEED, ref getValue, ref getFValue);
+
+            Assert.That(getValue, Is.EqualTo(2));
+            Assert.That(getFValue, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TestFeature()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = dirName + "/bensound-epic.mp3";
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            Assert.That(() => mpg123.Feature(Mpg123.Mpg123FeatureSet.MPG123_FEATURE_EQUALIZER), Throws.Nothing);
         }
     }
 }
