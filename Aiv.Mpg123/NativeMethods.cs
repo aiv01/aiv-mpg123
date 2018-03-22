@@ -24,6 +24,15 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_decoders", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123Decoders();
 
+        [DllImport(LibraryName, EntryPoint = "mpg123_supported_decoders", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123SupportedDecoders();
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decoder", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123Decoder(IntPtr handle, IntPtr decoder);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_current_decoder", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123CurrentDecoder(IntPtr handle);
+
         [DllImport(LibraryName, EntryPoint = "mpg123_new", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123New(IntPtr decoder, ref int error);
 
@@ -47,6 +56,39 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_getparam", CallingConvention = CallingConvention.Cdecl)]
         internal extern static int NativeMpg123GetParam(IntPtr handle, [MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123Params type, ref IntPtr value, ref double fvalue);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_rates", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void NativeMpg123Rates(ref IntPtr list, ref UIntPtr number);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_encodings", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void NativeMpg123Encodings(ref IntPtr list, ref UIntPtr number);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_encsize", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int NativeMpg123EncodingsSize(int encoding);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_format_none", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123FormatNone(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_format_all", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123FormatAll(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_format", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123Format(IntPtr handle, IntPtr rate, int channels, int encodings);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_format_support", CallingConvention = CallingConvention.Cdecl)]
+        [return:MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.ChannelCount NativeMpg123FormatSupport(IntPtr handle, IntPtr rate, int encoding);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_getformat", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123GetFormat(IntPtr handle, ref IntPtr rate, ref int channels, ref int encoding);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_getformat2", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123GetFormat2(IntPtr handle, ref IntPtr rate, ref int channels, ref int encoding, int clearFlags);
 
         [DllImport(LibraryName, EntryPoint = "mpg123_feature", CallingConvention = CallingConvention.Cdecl)]
         internal extern static int NativeMpg123Feature([MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123FeatureSet key);
