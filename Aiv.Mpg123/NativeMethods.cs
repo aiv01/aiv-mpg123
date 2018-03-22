@@ -51,7 +51,12 @@ namespace Aiv.Mpg123
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Mpg123.Errors NativeMpg123Read(IntPtr handle, IntPtr outMemory, UIntPtr outMemSize, UIntPtr done);
 
-        //OUTPUT
+        [DllImport(LibraryName, EntryPoint = "mpg123_param", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int NativeMpg123SetParam(IntPtr handle, [MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123Params type, IntPtr value, double fvalue);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_getparam", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int NativeMpg123GetParam(IntPtr handle, [MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123Params type, ref IntPtr value, ref double fvalue);
+
         [DllImport(LibraryName, EntryPoint = "mpg123_rates", CallingConvention = CallingConvention.Cdecl)]
         internal extern static void NativeMpg123Rates(ref IntPtr list, ref UIntPtr number);
 
@@ -85,5 +90,7 @@ namespace Aiv.Mpg123
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Mpg123.Errors NativeMpg123GetFormat2(IntPtr handle, ref IntPtr rate, ref int channels, ref int encoding, int clearFlags);
 
+        [DllImport(LibraryName, EntryPoint = "mpg123_feature", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int NativeMpg123Feature([MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123FeatureSet key);
     }
 }

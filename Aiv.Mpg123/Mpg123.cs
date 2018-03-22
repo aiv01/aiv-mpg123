@@ -68,6 +68,31 @@ namespace Aiv.Mpg123
             NONE, MONO, STEREO, BOTH
         }
 
+        public enum Mpg123Params
+        {
+            MPG123_VERBOSE = 0, MPG123_FLAGS,
+            MPG123_ADD_FLAGS, MPG123_FORCE_RATE,
+            MPG123_DOWN_SAMPLE, MPG123_RVA,
+            MPG123_DOWNSPEED, MPG123_UPSPEED,
+            MPG123_START_FRAME, MPG123_DECODE_FRAMES,
+            MPG123_ICY_INTERVAL, MPG123_OUTSCALE,
+            MPG123_TIMEOUT, MPG123_REMOVE_FLAGS,
+            MPG123_RESYNC_LIMIT, MPG123_INDEX_SIZE,
+            MPG123_PREFRAMES, MPG123_FEEDPOOL,
+            MPG123_FEEDBUFFER, MPG123_FREEFORMAT_SIZE
+        }
+
+        public enum Mpg123FeatureSet
+        {
+            MPG123_FEATURE_ABI_UTF8OPEN = 0, MPG123_FEATURE_OUTPUT_8BIT,
+            MPG123_FEATURE_OUTPUT_16BIT, MPG123_FEATURE_OUTPUT_32BIT,
+            MPG123_FEATURE_INDEX, MPG123_FEATURE_PARSE_ID3V2,
+            MPG123_FEATURE_DECODE_LAYER1, MPG123_FEATURE_DECODE_LAYER2,
+            MPG123_FEATURE_DECODE_LAYER3, MPG123_FEATURE_DECODE_ACCURATE,
+            MPG123_FEATURE_DECODE_DOWNSAMPLE, MPG123_FEATURE_DECODE_NTOM,
+            MPG123_FEATURE_PARSE_ICY, MPG123_FEATURE_TIMEOUT_READ,
+            MPG123_FEATURE_EQUALIZER, MPG123_FEATURE_MOREINFO
+        }
 
         static private bool libraryInitialized;
         static public bool IsLibraryInitialized
@@ -112,9 +137,10 @@ namespace Aiv.Mpg123
                         yield break;
                     }
                     yield return Marshal.PtrToStringAnsi(sDecoderPtr);
-                 }
+                    offset += Marshal.SizeOf<IntPtr>();
                 }
-               }
+            }
+        }
 
         /// <summary>
         /// An IEnumerable of supported Rates
@@ -219,7 +245,7 @@ namespace Aiv.Mpg123
         public Errors GetFormat(ref long rate, ref int channels, ref int encoding)
         {
             IntPtr tempPtr = IntPtr.Zero;
-            Errors error = NativeMethods.NativeMpg123GetFormat(this.handle, ref tempPtr,ref channels,ref encoding);
+            Errors error = NativeMethods.NativeMpg123GetFormat(this.handle, ref tempPtr, ref channels, ref encoding);
             rate = (long)tempPtr;
             return error;
         }
@@ -351,6 +377,42 @@ namespace Aiv.Mpg123
             Dispose(false);
         }
 
+        public void SetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, long value = 0, double fvalue = 0)
+        {
+            int setParam = NativeMethods.NativeMpg123SetParam(handle, type, (IntPtr)value, fvalue);
+
+            if ((Errors)setParam != Errors.OK)
+            {
+                throw new ErrorException((Errors)setParam);
+            }
+        }
+
+        public void GetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, ref long value, ref double fValue)
+        {
+            IntPtr paramValue = IntPtr.Zero;
+            double paramFValue = 0;
+
+            int getParam = NativeMethods.NativeMpg123GetParam(handle, type, ref paramValue, ref paramFValue);
+
+            if ((Errors)getParam != Errors.OK)
+            {
+                throw new ErrorException((Errors)getParam);
+            }
+
+            value = (long)paramValue;
+            fValue = paramFValue;
+        }
+
+        public void Feature([MarshalAs(UnmanagedType.I4)] Mpg123FeatureSet key)
+        {
+            int feature = NativeMethods.NativeMpg123Feature(key);
+
+            if (feature == 0)
+            {
+                throw new Exception("unimplemented functions");
+            }
+        }
+
         private void SetDecoder(string decoder)
         {
             IntPtr decoderPtr = IntPtr.Zero;
@@ -362,7 +424,7 @@ namespace Aiv.Mpg123
         private string GetDecoder()
         {
             IntPtr decoderPtr = IntPtr.Zero;
-                
+
             decoderPtr = NativeMethods.NativeMpg123CurrentDecoder(handle);
             return Marshal.PtrToStringAnsi(decoderPtr);
         }
@@ -374,7 +436,7 @@ namespace Aiv.Mpg123
             {
                 _decoder = GetDecoder();
                 return _decoder;
-                
+
             }
             set
             {
