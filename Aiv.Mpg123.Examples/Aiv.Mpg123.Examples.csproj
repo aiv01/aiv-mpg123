@@ -48,5 +48,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Aiv.Mpg123\Aiv.Mpg123.csproj">
+      <Project>{eb2edacd-1f40-4b26-93b0-a4235f98026e}</Project>
+      <Name>Aiv.Mpg123</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
