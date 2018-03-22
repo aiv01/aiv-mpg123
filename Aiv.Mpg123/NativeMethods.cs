@@ -42,6 +42,9 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_format_all", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Mpg123.Errors NativeMpg123FormatAll(IntPtr handle);
-        
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_format", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123Format(IntPtr handle, IntPtr rate, int channels, int encodings);
     }
 }

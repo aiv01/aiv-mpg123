@@ -97,17 +97,30 @@ namespace Aiv.Mpg123
         /// <summary>
         /// Configure a mpg123 handle to accept no output format at all, use before specifying supported formats with mpg123_format
         /// </summary>
-        /// <returns>Return OK on succes</returns>
-        public static Errors FormatNone(Mpg123 handle)
+        /// <param name="handle">Can't be null</param>
+        /// <returns>Returns OK on succes</returns>
+        public Errors FormatNone()
         {
-            Errors error = NativeMethods.NativeMpg123FormatNone(handle.handle);
+            Errors error = NativeMethods.NativeMpg123FormatNone(this.handle);
             if (error != Errors.OK)
                 throw new ErrorException(error);
             return error;
         }
-        public static Errors FormatAll(Mpg123 handle)
+        /// <summary>
+        /// Configure mpg123 handle to accept all formats (also any custom rate you may set) – this is default.
+        /// </summary>
+        /// <param name="handle">Can't be null</param>
+        /// <returns>Returns OK on succes</returns>
+        public Errors FormatAll()
         {
-            Errors error = NativeMethods.NativeMpg123FormatAll(handle.handle);
+            Errors error = NativeMethods.NativeMpg123FormatAll(this.handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return error;
+        }
+        public Errors Format(long rate, int channels, int encodings)
+        {
+            Errors error = NativeMethods.NativeMpg123Format(this.handle, (IntPtr)rate, channels, encodings);
             if (error != Errors.OK)
                 throw new ErrorException(error);
             return error;
