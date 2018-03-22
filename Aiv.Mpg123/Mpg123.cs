@@ -16,6 +16,10 @@ namespace Aiv.Mpg123
         {
             OK = 0,
         }
+        public enum ChannelCount
+        {
+            NONE, MONO, STEREO, BOTH
+        }
 
         static private bool libraryInitialized;
         static public bool IsLibraryInitialized
@@ -118,11 +122,45 @@ namespace Aiv.Mpg123
                 throw new ErrorException(error);
             return error;
         }
+        /// <summary>
+        /// Set the audio format support of a mpg123_handle in detail
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <param name="channels"></param>
+        /// <param name="encodings"></param>
+        /// <returns></returns>
         public Errors Format(long rate, int channels, int encodings)
         {
             Errors error = NativeMethods.NativeMpg123Format(this.handle, (IntPtr)rate, channels, encodings);
             if (error != Errors.OK)
                 throw new ErrorException(error);
+            return error;
+        }
+        public ChannelCount IsFormatSupported(long rate, int encoding)
+        {
+            ChannelCount channels = NativeMethods.NativeMpg123FormatSupport(this.handle, (IntPtr)rate, encoding);
+            return channels;
+        }
+        /// <summary>
+        /// Get the current output format, written to reference passed
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <param name="channels"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public Errors GetFormat(ref long rate, ref int channels, ref int encoding)
+        {
+            IntPtr tempPtr = IntPtr.Zero;
+            Errors error = NativeMethods.NativeMpg123GetFormat(this.handle, ref tempPtr,ref channels,ref encoding);
+            rate = (long)tempPtr;
+            return error;
+        }
+        public Errors GetFormat(ref long rate, ref int channels, ref int encoding, bool clearFlags)
+        {
+            IntPtr tempPtr = IntPtr.Zero;
+            int _clearFlags = clearFlags ? 0 : 1;
+            Errors error = NativeMethods.NativeMpg123GetFormat2(this.handle, ref tempPtr, ref channels, ref encoding, _clearFlags);
+            rate = (long)tempPtr;
             return error;
         }
 
