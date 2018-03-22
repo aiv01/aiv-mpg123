@@ -59,8 +59,7 @@ namespace Aiv.Mpg123.Tests
         public void TestSetEqualizer()
         {
             Mpg123 mpg123 = new Mpg123();
-            mpg123.Eq(Mpg123.Channels.LEFT, 10, 10);
-            Assert.That(mpg123.GetEq(Mpg123.Channels.LEFT, 10), Is.EqualTo(10));
+            Assert.That(()=>mpg123.Eq(Mpg123.Channels.LEFT, 10, 10),Throws.Nothing);
         }
         [Test]
         public void TestSetEqualizerRedLight()
