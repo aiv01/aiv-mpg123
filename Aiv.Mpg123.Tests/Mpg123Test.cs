@@ -58,6 +58,7 @@ namespace Aiv.Mpg123.Tests
         }
 
         [Test]
+
         public void TestOpenPathNull()
         {
             Mpg123 mpg123 = new Mpg123();
@@ -98,6 +99,22 @@ namespace Aiv.Mpg123.Tests
             Mpg123 mpg123 = new Mpg123();
             mpg123.Open(path);
             Assert.That(() => mpg123.Close(), Throws.Nothing);
+        }
+
+        public void TestSetParamGetParam()
+        {
+            long setValue = 1000;
+            double setFValue = 2000;
+            long getValue = 0;
+            double getFValue = 0;
+
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.SetParam(Mpg123.Mpg123Params.MPG123_DECODE_FRAMES, setValue, setFValue);
+            mpg123.GetParam(Mpg123.Mpg123Params.MPG123_DECODE_FRAMES, ref getValue, ref getFValue);
+
+            Assert.That(getValue, Is.EqualTo(1000));
+            Assert.That(getFValue, Is.EqualTo(2000));
         }
     }
 }
