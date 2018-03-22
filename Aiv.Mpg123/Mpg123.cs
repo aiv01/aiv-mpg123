@@ -63,6 +63,10 @@ namespace Aiv.Mpg123
             LFS_OVERFLOW = 42,
             INT_OVERFLOW = 43
         }
+        public enum ChannelCount
+        {
+            NONE, MONO, STEREO, BOTH
+        }
 
 
         static private bool libraryInitialized;
@@ -93,6 +97,7 @@ namespace Aiv.Mpg123
             }
         }
 
+
         public static IEnumerable<string> SupportedDecoders
         {
             get
@@ -107,10 +112,126 @@ namespace Aiv.Mpg123
                         yield break;
                     }
                     yield return Marshal.PtrToStringAnsi(sDecoderPtr);
+                 }
+                }
+               }
+
+        /// <summary>
+        /// An IEnumerable of supported Rates
+        /// </summary>
+        public static IEnumerable<long> Rates
+        {
+            get
+            {
+                IntPtr ratesPtr = IntPtr.Zero;
+                UIntPtr number = UIntPtr.Zero;
+
+                NativeMethods.NativeMpg123Rates(ref ratesPtr, ref number);
+                int offset = 0;
+                for (ulong i = 0; i < (ulong)number; i++)
+                {
+                    long value = (long)Marshal.ReadIntPtr(ratesPtr, offset);
+                    yield return value;
                     offset += Marshal.SizeOf<IntPtr>();
                 }
             }
         }
+
+        /// <summary>
+        /// An IEnumerable of supported audio encodings
+        /// </summary>
+        public static IEnumerable<int> Encodings
+        {
+            get
+            {
+                IntPtr ratesPtr = IntPtr.Zero;
+                UIntPtr number = UIntPtr.Zero;
+
+                NativeMethods.NativeMpg123Encodings(ref ratesPtr, ref number);
+                int offset = 0;
+                for (ulong i = 0; i < (ulong)number; i++)
+                {
+                    int value = (int)Marshal.ReadInt32(ratesPtr, offset);
+                    yield return value;
+                    offset += Marshal.SizeOf<IntPtr>();
+                }
+            }
+        }
+        /// <summary>
+        /// Returns the size in bytes of one mono sample of the named encoding.
+        /// </summary>
+        /// <param name="encoding">The encoding value to analyze</param>
+        /// <returns>positive size of encoding in bytes, 0 on invalid encoding</returns>
+        public static int GetEncodingSize(int encoding)
+        {
+            return NativeMethods.NativeMpg123EncodingsSize(encoding);
+        }
+        /// <summary>
+        /// Configure a mpg123 handle to accept no output format at all, use before specifying supported formats with mpg123_format
+        /// </summary>
+        /// <param name="handle">Can't be null</param>
+        /// <returns>Returns OK on succes</returns>
+        public Errors FormatNone()
+        {
+            Errors error = NativeMethods.NativeMpg123FormatNone(this.handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return error;
+        }
+        /// <summary>
+        /// Configure mpg123 handle to accept all formats (also any custom rate you may set) – this is default.
+        /// </summary>
+        /// <param name="handle">Can't be null</param>
+        /// <returns>Returns OK on succes</returns>
+        public Errors FormatAll()
+        {
+            Errors error = NativeMethods.NativeMpg123FormatAll(this.handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return error;
+        }
+        /// <summary>
+        /// Set the audio format support of a mpg123_handle in detail
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <param name="channels"></param>
+        /// <param name="encodings"></param>
+        /// <returns></returns>
+        public Errors Format(long rate, int channels, int encodings)
+        {
+            Errors error = NativeMethods.NativeMpg123Format(this.handle, (IntPtr)rate, channels, encodings);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return error;
+        }
+        public ChannelCount IsFormatSupported(long rate, int encoding)
+        {
+            ChannelCount channels = NativeMethods.NativeMpg123FormatSupport(this.handle, (IntPtr)rate, encoding);
+            return channels;
+        }
+        /// <summary>
+        /// Get the current output format, written to reference passed
+        /// </summary>
+        /// <param name="rate"></param>
+        /// <param name="channels"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        public Errors GetFormat(ref long rate, ref int channels, ref int encoding)
+        {
+            IntPtr tempPtr = IntPtr.Zero;
+            Errors error = NativeMethods.NativeMpg123GetFormat(this.handle, ref tempPtr,ref channels,ref encoding);
+            rate = (long)tempPtr;
+            return error;
+        }
+        public Errors GetFormat(ref long rate, ref int channels, ref int encoding, bool clearFlags)
+        {
+            IntPtr tempPtr = IntPtr.Zero;
+            int _clearFlags = clearFlags ? 0 : 1;
+            Errors error = NativeMethods.NativeMpg123GetFormat2(this.handle, ref tempPtr, ref channels, ref encoding, _clearFlags);
+            rate = (long)tempPtr;
+            return error;
+        }
+
 
         public static string PlainStrError(Errors error)
         {
