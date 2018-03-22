@@ -105,22 +105,17 @@ namespace Aiv.Mpg123
         public static string StrError(IntPtr handle)
         {
             IntPtr error = NativeMethods.NativeMpg123StrError(handle);
-            if (error == null)
+            if (error == IntPtr.Zero)
             {
-                string errMessage = Marshal.PtrToStringAnsi(error);
-                return errMessage;
+                return null;
             }
             string errorMessage = Marshal.PtrToStringAnsi(error);
             return errorMessage;
         }
-        public static int ErrorCode(IntPtr handle)
+        public static Errors ErrorCode(IntPtr handle)
         {
-            int error = NativeMethods.NativeMpg123ErrorCode(handle);
-            if (error == 0)
-            {
-                return error;
-            }
-            return (int)Errors.BAD_HANDLE;
+            Errors error = NativeMethods.NativeMpg123ErrorCode(handle);
+            return error;
         }
 
 
@@ -140,7 +135,7 @@ namespace Aiv.Mpg123
             }
         }
 
-        public IntPtr handle;
+        protected IntPtr handle;
 
         public Mpg123(string decoder = null)
         {

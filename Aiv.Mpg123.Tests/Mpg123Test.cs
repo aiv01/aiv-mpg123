@@ -27,14 +27,14 @@ namespace Aiv.Mpg123.Tests
         public void TestStrError()
         {
             Mpg123 mpg123 = new Mpg123();
-            Assert.That(Mpg123.StrError(mpg123.handle), Is.Not.Null);
+            Assert.That(mpg123.HasValidHandle, Is.True);
         }
 
         [Test]
         public void TestErrorCode()
         {
             Mpg123 mpg123 = new Mpg123();
-            Assert.That(Mpg123.ErrorCode(mpg123.handle), Is.Not.Null);
+            Assert.That(mpg123.HasValidHandle, Is.True);
         }
 
         [Test]
