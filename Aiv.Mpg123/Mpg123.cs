@@ -45,6 +45,25 @@ namespace Aiv.Mpg123
             }
         }
 
+        public static IEnumerable<string> SupportedDecoders
+        {
+            get
+            {
+                IntPtr sDecodersPtr = NativeMethods.NativeMpg123SupportedDecoders();
+                int offset = 0;
+                while (true)
+                {
+                    IntPtr sDecoderPtr = Marshal.ReadIntPtr(sDecodersPtr, offset);
+                    if (sDecoderPtr == IntPtr.Zero)
+                    {
+                        yield break;
+                    }
+                    yield return Marshal.PtrToStringAnsi(sDecoderPtr);
+                    offset += Marshal.SizeOf<IntPtr>();
+                }
+            }
+        }
+
         public static string PlainStrError(Errors error)
         {
             IntPtr errorPtr = NativeMethods.NativeMpg123PlainStrError(error);
@@ -117,6 +136,38 @@ namespace Aiv.Mpg123
         ~Mpg123()
         {
             Dispose(false);
+        }
+
+        private void SetDecoder(string decoder)
+        {
+            IntPtr decoderPtr = IntPtr.Zero;
+
+            decoderPtr = Marshal.StringToHGlobalAnsi(decoder);
+            NativeMethods.NativeMpg123Decoder(handle, decoderPtr);
+        }
+
+        private string GetDecoder()
+        {
+            IntPtr decoderPtr = IntPtr.Zero;
+                
+            decoderPtr = NativeMethods.NativeMpg123CurrentDecoder(handle);
+            return Marshal.PtrToStringAnsi(decoderPtr);
+        }
+
+        private string _decoder;
+        public string Decoder
+        {
+            get
+            {
+                _decoder = GetDecoder();
+                return _decoder;
+                
+            }
+            set
+            {
+                _decoder = value;
+                SetDecoder(_decoder);
+            }
         }
     }
 }

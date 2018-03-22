@@ -18,12 +18,19 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_decoders", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123Decoders();
 
+        [DllImport(LibraryName, EntryPoint = "mpg123_supported_decoders", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123SupportedDecoders();
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decoder", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123Decoder(IntPtr handle, IntPtr decoder);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_current_decoder", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123CurrentDecoder(IntPtr handle);
+
         [DllImport(LibraryName, EntryPoint = "mpg123_new", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123New(IntPtr decoder, ref int error);
 
         [DllImport(LibraryName, EntryPoint = "mpg123_delete", CallingConvention = CallingConvention.Cdecl)]
         internal extern static void NativeMpg123Delete(IntPtr handle);
-
-
     }
 }
