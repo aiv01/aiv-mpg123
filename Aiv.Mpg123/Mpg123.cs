@@ -17,6 +17,13 @@ namespace Aiv.Mpg123
             OK = 0,
         }
 
+        public enum Channels
+        {
+            LEFT = 1,
+            RIGHT,
+            LR
+        }
+
         static private bool libraryInitialized;
         static public bool IsLibraryInitialized
         {
@@ -117,6 +124,53 @@ namespace Aiv.Mpg123
         ~Mpg123()
         {
             Dispose(false);
+        }
+
+        public bool Eq(Channels channel, int band, double val)
+        {
+            Errors error = NativeMethods.NativeMpg123Eq(handle, channel, band, val);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+
+            return true;
+        }
+
+        public double GetEq(Channels channel, int band)
+        {
+            double ret = NativeMethods.NativeMpg123GetEq(handle, channel, band);
+            return ret;
+        }
+
+        public bool ResetEq()
+        {
+            Errors error = NativeMethods.NativeMpg123ResetEq(handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return true;
+        }
+
+        public bool Volume(double vol)
+        {
+            Errors error = NativeMethods.NativeMpg123Volume(handle,vol);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return true;
+        }
+
+        public bool VolumeChange(double change)
+        {
+            Errors error = NativeMethods.NativeMpg123VolumeChange(handle, change);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return true;
+        }
+
+        public bool GetVolume(ref double base_,ref double really,ref double rva_db)
+        {
+            Errors error = NativeMethods.NativeMpg123GetVolume(handle, ref base_, ref really, ref rva_db);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return true;
         }
     }
 }
