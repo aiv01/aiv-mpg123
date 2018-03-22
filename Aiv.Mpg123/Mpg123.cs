@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 namespace Aiv.Mpg123
 {
-    public class Mpg123
+    public class Mpg123 : IDisposable
     {
         public class ErrorException : Exception
         {
@@ -62,5 +62,61 @@ namespace Aiv.Mpg123
             libraryInitialized = true;
         }
 
+        public bool HasValidHandle
+        {
+            get
+            {
+                return handle != IntPtr.Zero;
+            }
+        }
+
+        protected IntPtr handle;
+
+        public Mpg123(string decoder = null)
+        {
+            IntPtr decoderPtr = IntPtr.Zero;
+            if (decoder != null)
+            {
+                decoderPtr = Marshal.StringToHGlobalAnsi(decoder);
+            }
+            int error = 0;
+            handle = NativeMethods.NativeMpg123New(decoderPtr, ref error);
+            if (decoderPtr != IntPtr.Zero)
+                Marshal.FreeHGlobal(decoderPtr);
+            if (handle == IntPtr.Zero)
+                throw new ErrorException((Errors)error);
+        }
+
+        protected bool disposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool isDisposing)
+        {
+            if (disposed)
+                return;
+
+            if (handle != IntPtr.Zero)
+            {
+                NativeMethods.NativeMpg123Delete(handle);
+                handle = IntPtr.Zero;
+            }
+
+            if (isDisposing)
+            {
+                // cleanup dependancies
+            }
+
+            disposed = true;
+        }
+
+        ~Mpg123()
+        {
+            Dispose(false);
+        }
     }
 }

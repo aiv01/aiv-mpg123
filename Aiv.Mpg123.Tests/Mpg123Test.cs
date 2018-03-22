@@ -31,8 +31,29 @@ namespace Aiv.Mpg123.Tests
         [Test]
         public void TestDecoders()
         {
-
             Assert.That(Mpg123.Decoders.ToArray(), Has.Length.GreaterThan(0));
         }
+
+        [Test]
+        public void TestInstantiate()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(mpg123.HasValidHandle, Is.True);
+        }
+
+        [Test]
+        public void TestInstantiateWithInvalidDecoder()
+        {
+            Assert.That(() => new Mpg123("foobar"), Throws.TypeOf<Mpg123.ErrorException>());
+        }
+
+        [Test]
+        public void TestInstantiateWithDecoder()
+        {
+            string decoder = Mpg123.Decoders.ToArray()[0];
+            Mpg123 mpg123 = new Mpg123(decoder);
+            Assert.That(mpg123.HasValidHandle, Is.True);
+        }
+
     }
 }

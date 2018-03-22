@@ -18,6 +18,12 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_decoders", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123Decoders();
 
+        [DllImport(LibraryName, EntryPoint = "mpg123_new", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123New(IntPtr decoder, ref int error);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_delete", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void NativeMpg123Delete(IntPtr handle);
+
 
     }
 }
