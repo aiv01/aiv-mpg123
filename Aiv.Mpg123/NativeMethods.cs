@@ -24,6 +24,15 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_decoders", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123Decoders();
 
+        [DllImport(LibraryName, EntryPoint = "mpg123_supported_decoders", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123SupportedDecoders();
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decoder", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123Decoder(IntPtr handle, IntPtr decoder);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_current_decoder", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123CurrentDecoder(IntPtr handle);
+
         [DllImport(LibraryName, EntryPoint = "mpg123_new", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123New(IntPtr decoder, ref int error);
 
@@ -41,8 +50,6 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_read", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Mpg123.Errors NativeMpg123Read(IntPtr handle, IntPtr outMemory, UIntPtr outMemSize, UIntPtr done);
-
-
 
         //OUTPUT
         [DllImport(LibraryName, EntryPoint = "mpg123_rates", CallingConvention = CallingConvention.Cdecl)]

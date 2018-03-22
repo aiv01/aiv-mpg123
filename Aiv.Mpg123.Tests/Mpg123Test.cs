@@ -51,6 +51,63 @@ namespace Aiv.Mpg123.Tests
         }
 
         [Test]
+        public void TestSupportedDecoders()
+        {
+            Assert.That(Mpg123.SupportedDecoders.ToArray(), Has.Length.GreaterThan(0));
+        }
+
+        [Test]
+        public void TestSupportedDecodersValidLentgh()
+        {
+            var DecodersList = Mpg123.SupportedDecoders.ToArray();
+            Assert.That(Mpg123.SupportedDecoders.ToArray(), Has.Length.LessThanOrEqualTo(DecodersList.Length));
+        }
+
+        [Test]
+        public void TestGetDecoder()
+        {
+            string decoder = Mpg123.Decoders.ToArray()[0];
+
+            Mpg123 mpg123 = new Mpg123(decoder);
+            
+            Assert.That(mpg123.Decoder, Is.EqualTo(decoder));
+        }
+
+        [Test]
+        public void TestGetDecoderFalse()
+        {
+            string decoder = Mpg123.Decoders.ToArray()[0];
+            string notDecoder = Mpg123.Decoders.ToArray()[1];
+
+            Mpg123 mpg123 = new Mpg123(decoder);
+
+            Assert.That(mpg123.Decoder, Is.Not.EqualTo(notDecoder));
+        }
+
+        [Test]
+        public void TestSetDecoder()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            string decoder = Mpg123.Decoders.ToArray()[0];
+            mpg123.Decoder = decoder;
+
+            Assert.That(mpg123.Decoder, Is.EqualTo(decoder));
+        }
+
+        [Test]
+        public void TestSetDecoderFalse()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            string decoder = Mpg123.Decoders.ToArray()[0];
+            string notDecoder = Mpg123.Decoders.ToArray()[1];
+            mpg123.Decoder = decoder;
+
+            Assert.That(mpg123.Decoder, Is.Not.EqualTo(notDecoder));
+        }
+
+        [Test]
         public void TestInstantiate()
         {
             Mpg123 mpg123 = new Mpg123();
