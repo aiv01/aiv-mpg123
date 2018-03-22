@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Aiv.Mpg123.Tests
 {
-    public class Class1
+    public class Mpg123Test
     {
     }
 }
