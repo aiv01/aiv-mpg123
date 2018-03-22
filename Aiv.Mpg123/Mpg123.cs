@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 namespace Aiv.Mpg123
 {
@@ -302,6 +303,43 @@ namespace Aiv.Mpg123
         }
 
         protected IntPtr handle;
+
+        #region SEEK_POSITION
+
+        public long Tell()
+        {
+            return (long)NativeMethods.NativeMpg123Tell(handle);
+        }
+
+        public long TellFrame()
+        {
+            return (long)NativeMethods.NativeMpg123TellFrame(handle);
+        }
+
+        public long TellStream()
+        {
+            return (long)NativeMethods.NativeMpg123TellStream(handle);
+        }
+
+        public long Seek(long offSample, SeekOrigin whence)
+        {
+            long offset = (long)NativeMethods.NativeMpg123Seek(handle, (IntPtr)offSample, whence);
+            return offset >= 0 ? offset : throw new ErrorException((Errors)offset);
+        }
+
+        public long SeekFrame(long frameOff, SeekOrigin whence)
+        {
+            long offset = (long)NativeMethods.NativeMpg123SeekFrame(handle, (IntPtr)frameOff, whence);
+            return offset >= 0 ? offset : throw new ErrorException((Errors)offset);
+        }
+
+        public long TimeFrame(double sec)
+        {
+            long frameOffset = (long)NativeMethods.NativeMpg123TimeFrame(handle, sec);
+            return frameOffset >= 0 ? frameOffset : throw new ErrorException((Errors)frameOffset);
+        }
+
+        #endregion
 
         public Mpg123(string decoder = null)
         {

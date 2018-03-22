@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Aiv.Mpg123
@@ -92,5 +93,26 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_feature", CallingConvention = CallingConvention.Cdecl)]
         internal extern static int NativeMpg123Feature([MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123FeatureSet key);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_tell", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123Tell(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_tellframe", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123TellFrame(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_tell_stream", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123TellStream(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_seek", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr NativeMpg123Seek(IntPtr handle, IntPtr offSample, SeekOrigin whence);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_feedseek", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr NativeMpg123FeedSeek(IntPtr handle, IntPtr offSample, SeekOrigin whence, ref IntPtr inputOffset);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_seek_frame", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr NativeMpg123SeekFrame(IntPtr handle, IntPtr frameOff, SeekOrigin whence);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_timeframe", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr NativeMpg123TimeFrame(IntPtr handle, double sec);
     }
 }
