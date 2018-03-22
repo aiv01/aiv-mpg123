@@ -59,7 +59,8 @@ namespace Aiv.Mpg123.Tests
         public void TestSetEqualizer()
         {
             Mpg123 mpg123 = new Mpg123();
-            Assert.That(mpg123.Eq(Mpg123.Channels.LEFT, 10, 10), Is.True);
+            mpg123.Eq(Mpg123.Channels.LEFT, 10, 10);
+            Assert.That(mpg123.GetEq(Mpg123.Channels.LEFT, 10), Is.EqualTo(10));
         }
         [Test]
         public void TestSetEqualizerRedLight()
@@ -88,7 +89,7 @@ namespace Aiv.Mpg123.Tests
         public void TestResetEqualizer()
         {
             Mpg123 mpg123 = new Mpg123();
-            Assert.That(mpg123.ResetEq(), Is.True);
+            Assert.That(() => mpg123.ResetEq(), Throws.Nothing);
         }
 
         [Test]
@@ -103,7 +104,7 @@ namespace Aiv.Mpg123.Tests
         public void TestVolume()
         {
             Mpg123 mpg123 = new Mpg123();
-            Assert.That(mpg123.Volume(20), Is.True);
+            Assert.That(() => mpg123.Volume(20), Throws.Nothing);
 
             double base_ = 0;
             double really = 0;
@@ -121,7 +122,7 @@ namespace Aiv.Mpg123.Tests
             double base_ = 0;
             double really = 0;
             double rva_db = 0;
-            Assert.That(mpg123.Volume(20), Is.True);
+            Assert.That(() => mpg123.Volume(20), Throws.Nothing);
             mpg123.GetVolume(ref base_, ref really, ref rva_db);
             Assert.That(base_, Is.Not.EqualTo(0));
         }
@@ -131,7 +132,7 @@ namespace Aiv.Mpg123.Tests
             Mpg123 mpg123 = new Mpg123();
             mpg123.Volume(20);
 
-            Assert.That(mpg123.VolumeChange(10), Is.True);
+            Assert.That(() => mpg123.VolumeChange(10), Throws.Nothing);
 
             double expectedVolume = 30;
 
@@ -140,7 +141,7 @@ namespace Aiv.Mpg123.Tests
             double rva_db = 0;
             mpg123.GetVolume(ref base_, ref really, ref rva_db);
 
-            Assert.That(base_,Is.EqualTo(expectedVolume));
+            Assert.That(base_, Is.EqualTo(expectedVolume));
         }
 
         [Test]
@@ -166,7 +167,7 @@ namespace Aiv.Mpg123.Tests
             double base_ = 0;
             double really = 0;
             double rva_db = 0;
-            Assert.That(mpg123.GetVolume(ref base_, ref really, ref rva_db), Is.True);
+            Assert.That(() => mpg123.GetVolume(ref base_, ref really, ref rva_db), Throws.Nothing);
             Assert.That(base_, Is.EqualTo(50));
             Assert.That(really, Is.EqualTo(50));
         }
@@ -179,7 +180,7 @@ namespace Aiv.Mpg123.Tests
             double base_ = 20;
             double really = 20;
             double rva_db = 0;
-            Assert.That(mpg123.GetVolume(ref base_, ref really, ref rva_db), Is.True);
+            Assert.That(() => mpg123.GetVolume(ref base_, ref really, ref rva_db), Throws.Nothing);
             Assert.That(base_, Is.Not.EqualTo(20));
             Assert.That(really, Is.Not.EqualTo(20));
         }
