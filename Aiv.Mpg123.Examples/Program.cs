@@ -10,6 +10,12 @@ namespace Aiv.Mpg123.Examples
     {
         static void Main(string[] args)
         {
+            foreach (string decoder in Mpg123.Decoders)
+            {
+                Console.WriteLine(decoder);
+            }
+
+            Console.ReadLine();
         }
     }
 }
