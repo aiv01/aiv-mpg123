@@ -53,33 +53,57 @@ namespace Aiv.Mpg123
             get
             {
                 IntPtr ratesPtr = IntPtr.Zero;
-                int number = 0;
+                UIntPtr number = UIntPtr.Zero;
 
                 NativeMethods.NativeMpg123Rates(ref ratesPtr, ref number);
-
-                for (int i = 0; i < number; i++)
+                int offset = 0;
+                for (ulong i = 0; i < (ulong)number; i++)
                 {
-                    long value = (long)Marshal.ReadIntPtr(ratesPtr, i * Marshal.SizeOf<IntPtr>());
+                    long value = (long)Marshal.ReadIntPtr(ratesPtr, offset);
                     yield return value;
+                    offset += Marshal.SizeOf<IntPtr>();
                 }
             }
         }
-
+        /// <summary>
+        /// An IEnumerable of supported audio encodings
+        /// </summary>
         public static IEnumerable<int> Encodings
         {
             get
             {
                 IntPtr ratesPtr = IntPtr.Zero;
-                int number = 0;
+                UIntPtr number = UIntPtr.Zero;
 
                 NativeMethods.NativeMpg123Encodings(ref ratesPtr, ref number);
-
-                for (int i = 0; i < number; i++)
+                int offset = 0;
+                for (ulong i = 0; i < (ulong)number; i++)
                 {
-                    int value = (int)Marshal.ReadInt32(ratesPtr, i * Marshal.SizeOf<IntPtr>());
+                    int value = (int)Marshal.ReadInt32(ratesPtr, offset);
                     yield return value;
+                    offset += Marshal.SizeOf<IntPtr>();
                 }
             }
+        }
+        /// <summary>
+        /// Returns the size in bytes of one mono sample of the named encoding.
+        /// </summary>
+        /// <param name="encoding">The encoding value to analyze</param>
+        /// <returns>positive size of encoding in bytes, 0 on invalid encoding</returns>
+        public static int GetEncodingSize(int encoding)
+        {
+            return NativeMethods.NativeMpg123EncodingsSize(encoding);
+        }
+        /// <summary>
+        /// Configure a mpg123 handle to accept no output format at all, use before specifying supported formats with mpg123_format
+        /// </summary>
+        /// <returns>Return OK on succes</returns>
+        public static Errors FormatNone(Mpg123 handle)
+        {
+            Errors error = NativeMethods.NativeMpg123FormatNone(handle.handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return error;
         }
 
         public static string PlainStrError(Errors error)

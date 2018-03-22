@@ -27,9 +27,16 @@ namespace Aiv.Mpg123
 
         //OUTPUT
         [DllImport(LibraryName, EntryPoint = "mpg123_rates", CallingConvention = CallingConvention.Cdecl)]
-        internal extern static void NativeMpg123Rates(ref IntPtr list, ref int number);
+        internal extern static void NativeMpg123Rates(ref IntPtr list, ref UIntPtr number);
 
         [DllImport(LibraryName, EntryPoint = "mpg123_encodings", CallingConvention = CallingConvention.Cdecl)]
-        internal extern static void NativeMpg123Encodings(ref IntPtr list, ref int number);
+        internal extern static void NativeMpg123Encodings(ref IntPtr list, ref UIntPtr number);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_encsize", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int NativeMpg123EncodingsSize(int encoding);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_format_none", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123FormatNone(IntPtr handle);
     }
 }
