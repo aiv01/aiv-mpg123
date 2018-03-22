@@ -87,6 +87,33 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
+        public void Open(string path)
+        {
+            IntPtr pathPtr = IntPtr.Zero;
+
+            if (path != null)
+            {
+                pathPtr = Marshal.StringToHGlobalAnsi(path);
+            }
+
+            Errors error = NativeMethods.NativeMpg123Open(handle, pathPtr);
+
+            if (error != Errors.OK)
+                throw new ErrorException((Errors)error);
+        }
+
+        public void Close()
+        {
+            Errors error = NativeMethods.NativeMpg123Close(handle);
+            if (error != Errors.OK)
+                throw new ErrorException((Errors)error);
+        }
+
+        //public void Read(byte[] buffer, ulong offset)
+        //{
+        //    NativeMethods.NativeMpg123Read(handle, )
+        //}
+
         protected bool disposed;
 
         public void Dispose()
