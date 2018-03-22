@@ -105,6 +105,13 @@ namespace Aiv.Mpg123
                 throw new ErrorException(error);
             return error;
         }
+        public static Errors FormatAll(Mpg123 handle)
+        {
+            Errors error = NativeMethods.NativeMpg123FormatAll(handle.handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+            return error;
+        }
 
         public static string PlainStrError(Errors error)
         {

@@ -27,6 +27,30 @@ namespace Aiv.Mpg123.Tests
         }
 
         //TODO: TEST WITH INVALID VALUE?
+
+        [Test]
+        public void TestFormatNoneWithNullThrowEx()
+        {
+            Assert.That(() => Mpg123.FormatNone(null), Throws.TypeOf<NullReferenceException>());
+        }
+        [Test]
+        public void TestFormatNoneOK()
+        {
+            Mpg123 handle = new Mpg123();
+            Assert.That(Mpg123.FormatNone(handle), Is.EqualTo(Mpg123.Errors.OK));
+        }
+
+        [Test]
+        public void TestFormatAllWithNullThrowEx()
+        {
+            Assert.That(() => Mpg123.FormatAll(null), Throws.TypeOf<NullReferenceException>());
+        }
+        [Test]
+        public void TestFormatAllOK()
+        {
+            Mpg123 handle = new Mpg123();
+            Assert.That(Mpg123.FormatAll(handle), Is.EqualTo(Mpg123.Errors.OK));
+        }
     }
 
    
