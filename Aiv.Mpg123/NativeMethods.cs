@@ -9,7 +9,6 @@ namespace Aiv.Mpg123
         internal const string LibraryName = "libmpg123-0.dll";
 
         [DllImport(LibraryName, EntryPoint = "mpg123_init", CallingConvention = CallingConvention.Cdecl)]
-        // aspetta che ti passo un valore 32bit e castamelo ad Mpg123.Errors
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Mpg123.Errors NativeMpg123Init();
 
@@ -30,6 +29,19 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_delete", CallingConvention = CallingConvention.Cdecl)]
         internal extern static void NativeMpg123Delete(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_open", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123Open(IntPtr handle, IntPtr path);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_close", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123Close(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_read", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Mpg123.Errors NativeMpg123Read(IntPtr handle, IntPtr outMemory, UIntPtr outMemSize, UIntPtr done);
+
 
 
     }

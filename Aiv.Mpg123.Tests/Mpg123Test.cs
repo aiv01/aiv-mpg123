@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using System.Linq;
+using System.Reflection;
+using System.IO;
 
 namespace Aiv.Mpg123.Tests
 {
@@ -69,5 +71,47 @@ namespace Aiv.Mpg123.Tests
             Assert.That(mpg123.HasValidHandle, Is.True);
         }
 
+        [Test]
+        public void TestOpenPathNull()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(() => mpg123.Open(null), Throws.Nothing);
+        }
+
+        [Test]
+
+        public void TestOpenPathInvalid()
+        {
+            string path = "test.mp3";
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(() => mpg123.Open(path), Throws.TypeOf<Mpg123.ErrorException>());
+        }
+
+        [Test]
+        public void TestOpenPathValid()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = dirName + "/bensound-epic.mp3";
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(() => mpg123.Open(path), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestCloseNoOpen()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(() => mpg123.Close(), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestCloseOpen()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = dirName + "/bensound-epic.mp3";
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+            Assert.That(() => mpg123.Close(), Throws.Nothing);
+        }
     }
 }

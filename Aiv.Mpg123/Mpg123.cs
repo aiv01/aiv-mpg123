@@ -64,6 +64,7 @@ namespace Aiv.Mpg123
             INT_OVERFLOW = 43
         }
 
+
         static private bool libraryInitialized;
         static public bool IsLibraryInitialized
         {
@@ -104,7 +105,7 @@ namespace Aiv.Mpg123
         public static string StrError(IntPtr handle)
         {
             IntPtr error = NativeMethods.NativeMpg123StrError(handle);
-            if(error == null)
+            if (error == null)
             {
                 string errMessage = Marshal.PtrToStringAnsi(error);
                 return errMessage;
@@ -121,6 +122,7 @@ namespace Aiv.Mpg123
             }
             return (int)Errors.BAD_HANDLE;
         }
+
 
         static Mpg123()
         {
@@ -154,6 +156,33 @@ namespace Aiv.Mpg123
             if (handle == IntPtr.Zero)
                 throw new ErrorException((Errors)error);
         }
+
+        public void Open(string path)
+        {
+            IntPtr pathPtr = IntPtr.Zero;
+
+            if (path != null)
+            {
+                pathPtr = Marshal.StringToHGlobalAnsi(path);
+            }
+
+            Errors error = NativeMethods.NativeMpg123Open(handle, pathPtr);
+
+            if (error != Errors.OK)
+                throw new ErrorException((Errors)error);
+        }
+
+        public void Close()
+        {
+            Errors error = NativeMethods.NativeMpg123Close(handle);
+            if (error != Errors.OK)
+                throw new ErrorException((Errors)error);
+        }
+
+        //public void Read(byte[] buffer, ulong offset)
+        //{
+        //    NativeMethods.NativeMpg123Read(handle, )
+        //}
 
         protected bool disposed;
 
