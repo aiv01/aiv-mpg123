@@ -24,6 +24,20 @@ namespace Aiv.Mpg123.Tests
         }
 
         [Test]
+        public void TestStrError()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(mpg123.HasValidHandle, Is.True);
+        }
+
+        [Test]
+        public void TestErrorCode()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(mpg123.HasValidHandle, Is.True);
+        }
+
+        [Test]
         public void TestPlainStrErrorWithInvalid()
         {
 

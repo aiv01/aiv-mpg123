@@ -15,6 +15,12 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "mpg123_plain_strerror", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123PlainStrError([MarshalAs(UnmanagedType.I4)] Mpg123.Errors error);
 
+        [DllImport(LibraryName, EntryPoint = "mpg123_strerror", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static IntPtr NativeMpg123StrError(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_errcode", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static Mpg123.Errors NativeMpg123ErrorCode(IntPtr handle);
+
         [DllImport(LibraryName, EntryPoint = "mpg123_decoders", CallingConvention = CallingConvention.Cdecl)]
         internal extern static IntPtr NativeMpg123Decoders();
 
