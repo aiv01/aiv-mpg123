@@ -45,6 +45,43 @@ namespace Aiv.Mpg123
             }
         }
 
+        /// <summary>
+        /// An IEnumerable of supported Rates
+        /// </summary>
+        public static IEnumerable<long> Rates
+        {
+            get
+            {
+                IntPtr ratesPtr = IntPtr.Zero;
+                int number = 0;
+
+                NativeMethods.NativeMpg123Rates(ref ratesPtr, ref number);
+
+                for (int i = 0; i < number; i++)
+                {
+                    long value = (long)Marshal.ReadIntPtr(ratesPtr, i * Marshal.SizeOf<IntPtr>());
+                    yield return value;
+                }
+            }
+        }
+
+        public static IEnumerable<int> Encodings
+        {
+            get
+            {
+                IntPtr ratesPtr = IntPtr.Zero;
+                int number = 0;
+
+                NativeMethods.NativeMpg123Encodings(ref ratesPtr, ref number);
+
+                for (int i = 0; i < number; i++)
+                {
+                    int value = (int)Marshal.ReadInt32(ratesPtr, i * Marshal.SizeOf<IntPtr>());
+                    yield return value;
+                }
+            }
+        }
+
         public static string PlainStrError(Errors error)
         {
             IntPtr errorPtr = NativeMethods.NativeMpg123PlainStrError(error);
