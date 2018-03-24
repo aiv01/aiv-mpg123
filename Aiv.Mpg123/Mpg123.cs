@@ -378,10 +378,38 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
-        //public void Read(byte[] buffer, ulong offset)
-        //{
-        //    NativeMethods.NativeMpg123Read(handle, )
-        //}
+        /// <summary>
+        /// Read from stream and decode up to the length of outMemory bytes.
+        /// </summary>
+        /// <param name="outMemory">memory buffer to write to</param>
+        /// <param name="done">integer to store the number of actually decoded bytes to</param>
+        /// <returns></returns>
+        public Errors Read(byte[] outMemory, ref uint done)
+        {
+            IntPtr outMemoryPtr = IntPtr.Zero;
+            UIntPtr outMemSizePtr = new UIntPtr((uint)outMemory.Length);
+            UIntPtr donePtr = new UIntPtr(done);
+
+            outMemoryPtr = Marshal.AllocHGlobal(outMemory.Length);
+            if (outMemoryPtr != IntPtr.Zero)
+                Marshal.Copy(outMemory, 0, outMemoryPtr, outMemory.Length);
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123Read(handle, outMemoryPtr, outMemSizePtr, ref donePtr);
+
+            if (outMemoryPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(outMemoryPtr, outMemory, 0, outMemory.Length);
+                Marshal.FreeHGlobal(outMemoryPtr);
+            }
+
+            done = donePtr.ToUInt32();
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException((Errors)error);
+
+            return error;
+        }
 
         protected bool disposed;
 
