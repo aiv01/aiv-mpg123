@@ -148,7 +148,7 @@ namespace Aiv.Mpg123.Tests
         public void TestOpenPathValid()
         {
             string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string path = dirName + "/bensound-epic.mp3";
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
             Mpg123 mpg123 = new Mpg123();
             Assert.That(() => mpg123.Open(path), Throws.Nothing);
         }
@@ -164,7 +164,7 @@ namespace Aiv.Mpg123.Tests
         public void TestCloseOpen()
         {
             string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string path = dirName + "/bensound-epic.mp3";
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
 
             Mpg123 mpg123 = new Mpg123();
             mpg123.Open(path);
@@ -179,7 +179,7 @@ namespace Aiv.Mpg123.Tests
             double getFValue = 0;
 
             string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            string path = dirName + "/bensound-epic.mp3";
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
 
             Mpg123 mpg123 = new Mpg123();
             mpg123.Open(path);
@@ -201,6 +201,112 @@ namespace Aiv.Mpg123.Tests
             mpg123.Open(path);
 
             Assert.That(() => mpg123.Feature(Mpg123.Mpg123FeatureSet.MPG123_FEATURE_EQUALIZER), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestReadNullBuffer()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+            uint done = 0;
+            Assert.That(() => mpg123.Read(null, ref done), Throws.TypeOf<NullReferenceException>());
+        }
+
+        [Test]
+        public void TestReadNoOpen()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            uint done = 0;
+            byte[] buffer = new byte[100];
+            Assert.That(() => mpg123.Read(buffer, ref done), Throws.TypeOf<Mpg123.ErrorException>());
+        }
+
+        [Test]
+        public void TestReadOpen()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+            byte[] buffer = new byte[1000];
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+            uint done = 0;
+            Assert.That(() => mpg123.Read(buffer, ref done), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestReadNewFormat()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            uint done = 0;
+            byte[] buffer = new byte[1000];
+
+            Assert.That(mpg123.Read(buffer, ref done), Is.EqualTo(Mpg123.Errors.NEW_FORMAT));
+        }
+
+        [Test]
+        public void TestReadNoNewFormat()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            uint done = 0;
+            byte[] buffer = new byte[1000];
+
+            int b = 0, c = 0;
+            long a = 0;
+            mpg123.GetFormat(ref a, ref b, ref c);
+
+            Assert.That(mpg123.Read(buffer, ref done), Is.EqualTo(Mpg123.Errors.OK));
+        }
+
+        [Test]
+        public void TestReadDoneBytes()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-scifi.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            uint bufferSize = mpg123.Outblock();
+
+            uint done = 0;
+            byte[] buffer = new byte[1000];
+
+            while (mpg123.Read(buffer, ref done) != Mpg123.Errors.OK) { }
+            Assert.That(done, Is.EqualTo(1000));
+        }
+
+        [Test]
+        public void TestReadEmptyBuffer()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            uint done = 0;
+            byte[] buffer = new byte[0];
+
+            Mpg123.Errors error = Mpg123.Errors.OK;
+            while (error == Mpg123.Errors.OK)
+            {
+                Assert.That(() => error = mpg123.Read(buffer, ref done), Throws.Nothing);
+            }
+
+            Assert.That(done, Is.EqualTo(0));
         }
 
         #region SEEKS_TESTS
