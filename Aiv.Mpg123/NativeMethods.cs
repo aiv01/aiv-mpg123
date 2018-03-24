@@ -123,5 +123,9 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_feed", CallingConvention = CallingConvention.Cdecl)]
         internal static extern Mpg123.Errors NativeMpg123Feed(IntPtr handle, IntPtr inBuff, UIntPtr size);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decode", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123Decode(IntPtr handle, IntPtr inMemory, UIntPtr inMemorySize, IntPtr outMemory, UIntPtr outMemorySize, ref UIntPtr done);
+
     }
 }
