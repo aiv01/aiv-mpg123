@@ -448,6 +448,67 @@ namespace Aiv.Mpg123
                 throw new ErrorException(error);
         }
 
+        public Errors Feed(byte[] inBuff)
+        {
+            IntPtr inBuffPtr = IntPtr.Zero;
+            UIntPtr sizePtr = UIntPtr.Zero;
+
+            inBuffPtr = Marshal.AllocHGlobal(inBuff.Length);
+            sizePtr = new UIntPtr((uint)inBuff.Length);
+
+            if (inBuffPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(inBuff, 0, inBuffPtr, inBuff.Length);
+            }
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123Feed(handle, inBuffPtr, sizePtr);
+
+            if (inBuffPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(inBuffPtr, inBuff, 0, inBuff.Length);
+                Marshal.FreeHGlobal(inBuffPtr);
+            }
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException(error);
+
+            return error;
+        }
+
+        public Errors Decode(byte[] inMemory, byte[] outMemory, ref uint done)
+        {
+            IntPtr inMemoryPtr          = IntPtr.Zero;
+            UIntPtr inMemorySizePtr     = UIntPtr.Zero;
+            IntPtr outMemoryPtr         = IntPtr.Zero;
+            UIntPtr outMemorySizePtr    = UIntPtr.Zero;
+            UIntPtr donePtr             = UIntPtr.Zero;
+
+            inMemorySizePtr = new UIntPtr((uint)inMemory.Length);
+            outMemorySizePtr = new UIntPtr((uint)outMemory.Length);
+            donePtr = new UIntPtr(done);
+
+            inMemoryPtr = Marshal.AllocHGlobal(inMemory.Length);
+            outMemoryPtr = Marshal.AllocHGlobal(outMemory.Length);
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123Decode(handle, inMemoryPtr, inMemorySizePtr, outMemoryPtr, outMemorySizePtr, ref donePtr);
+
+            if(inMemoryPtr != IntPtr.Zero)
+                Marshal.FreeHGlobal(inMemoryPtr);
+
+            if (outMemoryPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(outMemoryPtr, outMemory, 0, outMemory.Length);
+                Marshal.FreeHGlobal(outMemoryPtr);
+            }
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException(error);
+
+            return error;
+        }
+
         protected bool disposed;
 
         public void Dispose()
