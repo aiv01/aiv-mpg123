@@ -278,9 +278,7 @@ namespace Aiv.Mpg123.Tests
 
             Mpg123 mpg123 = new Mpg123();
             mpg123.Open(path);
-
-            uint bufferSize = mpg123.Outblock();
-
+            
             uint done = 0;
             byte[] buffer = new byte[1000];
 
