@@ -411,6 +411,43 @@ namespace Aiv.Mpg123
             return error;
         }
 
+        public Errors DecodeFrame(ref int num, ref byte[] audio, ref uint bytes)
+        {
+            IntPtr numPtr       = IntPtr.Zero;
+            UIntPtr bytesPtr    = UIntPtr.Zero;
+            IntPtr audioPtr     = IntPtr.Zero;
+
+            numPtr = new IntPtr(num);
+            bytesPtr = new UIntPtr(bytes);
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123DecodeFrame(handle, ref numPtr, audioPtr, ref bytesPtr);
+
+            num = numPtr.ToInt32();
+            bytes = bytesPtr.ToUInt32();
+            audio = new byte[bytes];
+
+            if (audioPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(audioPtr, audio, 0, (int)bytes);
+                Marshal.FreeHGlobal(audioPtr);
+            }
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException((Errors)error);
+
+            return error;
+        }
+
+        public void OpenFeed()
+        {
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123OpenFeed(handle);
+
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+        }
+
         protected bool disposed;
 
         public void Dispose()

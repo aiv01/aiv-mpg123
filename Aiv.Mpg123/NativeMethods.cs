@@ -114,5 +114,11 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_timeframe", CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr NativeMpg123TimeFrame(IntPtr handle, double sec);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decode_frame", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123DecodeFrame(IntPtr handle, ref IntPtr num, IntPtr audio, ref UIntPtr bytes);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_open_feed", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123OpenFeed(IntPtr handle);
     }
 }
