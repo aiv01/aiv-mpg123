@@ -523,6 +523,54 @@ namespace Aiv.Mpg123.Tests
             Assert.That(() => mpg123.OpenFeed(), Throws.Nothing);
         }
 
+        [Test]
+        public void TestDecodeFrameNeedMore()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] fileBytes = File.ReadAllBytes(path);
+            byte[] buffer = new byte[8];
+            Array.Copy(fileBytes, buffer, 8);
+
+            int num = 0;
+            uint bytes = 0;
+
+            int b = 0, c = 0;
+            long a = 0;
+            mpg123.GetFormat(ref a, ref b, ref c);
+
+            Mpg123.Errors error = Mpg123.Errors.OK;
+            Assert.That(() => error = mpg123.DecodeFrame(ref num, ref buffer, ref bytes), Throws.Nothing);
+
+            Assert.That(error, Is.EqualTo(Mpg123.Errors.NEED_MORE));
+        }
+
+        [Test]
+        public void TestReadNeedMore()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] buffer = new byte[8];
+
+            uint done = 0;
+
+            int b = 0, c = 0;
+            long a = 0;
+            mpg123.GetFormat(ref a, ref b, ref c);
+
+            Mpg123.Errors error = Mpg123.Errors.OK;
+            Assert.That(() => error = mpg123.Read(buffer, ref done), Throws.Nothing);
+
+            Assert.That(error, Is.EqualTo(Mpg123.Errors.NEED_MORE));
+        }
+
         #region SEEKS_TESTS
 
         [Test]
