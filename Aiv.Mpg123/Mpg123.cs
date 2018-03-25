@@ -356,6 +356,11 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
+        /// <summary>
+        /// Open and prepare to decode the specified file.
+        /// </summary>
+        /// <param name="path">path of the file to open</param>
+        /// <returns></returns>
         public void Open(string path)
         {
             IntPtr pathPtr = IntPtr.Zero;
@@ -371,6 +376,10 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
+        /// <summary>
+        /// Closes the source, if libmpg123 opened it.
+        /// </summary>
+        /// <returns></returns>
         public void Close()
         {
             Errors error = NativeMethods.NativeMpg123Close(handle);
@@ -411,6 +420,13 @@ namespace Aiv.Mpg123
             return error;
         }
 
+        /// <summary>
+        /// Decode next MPEG frame to internal buffer or read a frame and return after setting a new format.
+        /// </summary>
+        /// <param name="num">current frame offset gets stored there</param>
+        /// <param name="audio">reference set to a buffer to read the decoded audio from.</param>
+        /// <param name="bytes">number of output bytes ready in the buffer</param>
+        /// <returns></returns>
         public Errors DecodeFrame(ref int num, ref byte[] audio, ref uint bytes)
         {
             IntPtr numPtr       = IntPtr.Zero;
@@ -439,6 +455,10 @@ namespace Aiv.Mpg123
             return error;
         }
 
+        /// <summary>
+        /// Open a new bitstream and prepare for direct feeding This works together with Decode(); 
+        /// you are responsible for reading and feeding the input bitstream.
+        /// </summary>
         public void OpenFeed()
         {
             Errors error = Errors.OK;
@@ -448,6 +468,11 @@ namespace Aiv.Mpg123
                 throw new ErrorException(error);
         }
 
+        /// <summary>
+        ///Feed data for a stream that has been opened with OpenFeed(). 
+        ///It's give and take: You provide the bytestream, mpg123 gives you the decoded samples.
+        /// </summary>
+        /// <param name="inBuff">input buffer</param>
         public Errors Feed(byte[] inBuff)
         {
             IntPtr inBuffPtr = IntPtr.Zero;
@@ -476,6 +501,12 @@ namespace Aiv.Mpg123
             return error;
         }
 
+        /// <summary>
+        ///Decode MPEG Audio from inmemory to outmemory. 
+        /// </summary>
+        /// <param name="inMemory">input buffer</param>
+        /// <param name="outMemory">output buffer</param>
+        /// <param name="done">integer to store the number of actually decoded bytes to</param>
         public Errors Decode(byte[] inMemory, byte[] outMemory, ref uint done)
         {
             IntPtr inMemoryPtr          = IntPtr.Zero;
