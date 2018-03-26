@@ -546,6 +546,18 @@ namespace Aiv.Mpg123
             return error;
         }
 
+        /// <summary>
+        /// Get the input position (byte offset in stream) of the last parsed frame. 
+        /// This can be used for external seek index building, for example. 
+        /// It just returns the internally stored offset, regardless of validity – you ensure that a valid frame has been parsed before!
+        /// </summary>
+        /// <returns></returns>
+        public int FramePos()
+        {
+            IntPtr ret = NativeMethods.NativeMpg123FramePos(handle);
+            return ret.ToInt32();
+        }
+
         protected bool disposed;
 
         public void Dispose()
