@@ -490,24 +490,23 @@ namespace Aiv.Mpg123
             error = NativeMethods.NativeMpg123Feed(handle, inBuffPtr, sizePtr);
 
             if (inBuffPtr != IntPtr.Zero)
-            {
-                Marshal.Copy(inBuffPtr, inBuff, 0, inBuff.Length);
                 Marshal.FreeHGlobal(inBuffPtr);
-            }
 
-            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+            if (error != Errors.OK)
                 throw new ErrorException(error);
 
             return error;
         }
 
         /// <summary>
-        ///Decode MPEG Audio from inmemory to outmemory. 
+        ///Decode MPEG Audio from inMemory to outMemory. 
         /// </summary>
         /// <param name="inMemory">input buffer</param>
+        /// <param name="inMemSize">number of input bytes</param>
         /// <param name="outMemory">output buffer</param>
+        /// <param name="outMemSize">maximum number of output bytes</param>
         /// <param name="done">integer to store the number of actually decoded bytes to</param>
-        public Errors Decode(byte[] inMemory, byte[] outMemory, ref uint done)
+        public Errors Decode(byte[] inMemory, uint inMemSize, byte[] outMemory, uint outMemSize, ref uint done)
         {
             IntPtr inMemoryPtr          = IntPtr.Zero;
             UIntPtr inMemorySizePtr     = UIntPtr.Zero;
@@ -515,22 +514,29 @@ namespace Aiv.Mpg123
             UIntPtr outMemorySizePtr    = UIntPtr.Zero;
             UIntPtr donePtr             = UIntPtr.Zero;
 
-            inMemorySizePtr = new UIntPtr((uint)inMemory.Length);
-            outMemorySizePtr = new UIntPtr((uint)outMemory.Length);
+            inMemorySizePtr = new UIntPtr(inMemSize);
+            outMemorySizePtr = new UIntPtr(outMemSize);
             donePtr = new UIntPtr(done);
 
-            inMemoryPtr = Marshal.AllocHGlobal(inMemory.Length);
-            outMemoryPtr = Marshal.AllocHGlobal(outMemory.Length);
+            inMemoryPtr = Marshal.AllocHGlobal((int)inMemSize);
+            outMemoryPtr = Marshal.AllocHGlobal((int)outMemSize);
+
+            if (inMemoryPtr != IntPtr.Zero && inMemory != null)
+                Marshal.Copy(inMemory, 0, inMemoryPtr, (int)inMemSize);
 
             Errors error = Errors.OK;
             error = NativeMethods.NativeMpg123Decode(handle, inMemoryPtr, inMemorySizePtr, outMemoryPtr, outMemorySizePtr, ref donePtr);
+
+            done = donePtr.ToUInt32();
 
             if(inMemoryPtr != IntPtr.Zero)
                 Marshal.FreeHGlobal(inMemoryPtr);
 
             if (outMemoryPtr != IntPtr.Zero)
             {
-                Marshal.Copy(outMemoryPtr, outMemory, 0, outMemory.Length);
+                if(outMemory != null)
+                    Marshal.Copy(outMemoryPtr, outMemory, 0, (int)outMemSize);
+
                 Marshal.FreeHGlobal(outMemoryPtr);
             }
 
