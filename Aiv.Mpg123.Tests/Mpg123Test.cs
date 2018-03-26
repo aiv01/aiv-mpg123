@@ -793,6 +793,34 @@ namespace Aiv.Mpg123.Tests
             Assert.That(() => mpg123.Decode(null, 0, outBuffer, 50, ref done), Throws.Nothing);
         }
 
+        [Test]
+        public void TestFramePosNoParsedFrame()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            Assert.That(mpg123.FramePos(), Is.EqualTo(-1));
+        }
+
+
+        [Test]
+        public void TestFramePosParsedFrame()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-scifi.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            byte[] buffer = null;
+            int num = 0;
+            uint bytes = 0;
+
+            mpg123.DecodeFrame(ref num, ref buffer, ref bytes);
+
+            Assert.That(mpg123.FramePos(), Is.GreaterThan(0));
+        }
+
+
         #region SEEKS_TESTS
 
         [Test]
