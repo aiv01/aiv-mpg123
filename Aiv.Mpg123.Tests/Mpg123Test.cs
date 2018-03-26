@@ -551,6 +551,28 @@ namespace Aiv.Mpg123.Tests
         }
 
         [Test]
+        public void TestDecodeFrameNumFramesTotal()
+        {
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Open(path);
+
+            byte[] buffer = null;
+            int num = 1;
+            uint bytes = 0;
+
+            Mpg123.Errors error = Mpg123.Errors.OK;
+            while (error != Mpg123.Errors.DONE)
+            {
+                error = mpg123.DecodeFrame(ref num, ref buffer, ref bytes);
+            }
+
+            Assert.That(num, Is.EqualTo(6834));
+        }
+
+        [Test]
         public void TestReadNeedMore()
         {
             Mpg123 mpg123 = new Mpg123();
@@ -569,6 +591,206 @@ namespace Aiv.Mpg123.Tests
             Assert.That(() => error = mpg123.Read(buffer, ref done), Throws.Nothing);
 
             Assert.That(error, Is.EqualTo(Mpg123.Errors.NEED_MORE));
+        }
+
+        [Test]
+        public void TestFeed()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] buffer = new byte[8];
+
+            Assert.That(() => mpg123.Feed(buffer), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestFeedReadNeedMore()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] inBuffer = new byte[8];
+            byte[] outBuffer = new byte[8];
+            uint done = 0;
+
+            mpg123.Feed(inBuffer);
+            Assert.That(mpg123.Read(outBuffer, ref done), Is.EqualTo(Mpg123.Errors.NEED_MORE));
+        }
+
+        [Test]
+        public void TestFeedReadNoNeedMore()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+
+            byte[] inBuffer = File.ReadAllBytes(path);
+            byte[] outBuffer = new byte[inBuffer.Length];
+            uint done = 0;
+
+            mpg123.Feed(inBuffer);
+
+            long a = 0;
+            int b = 0, c = 0;
+            mpg123.GetFormat(ref a, ref b, ref c);
+
+            Assert.That(mpg123.Read(outBuffer, ref done), Is.EqualTo(Mpg123.Errors.OK));
+            Assert.That(done, Is.EqualTo(inBuffer.Length));
+        }
+
+        [Test]
+        public void TestDecodeNullInput()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] outBuffer = new byte[8];
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(null, 0, outBuffer, 8, ref done), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestDecodeNullOutput()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] inBuffer = new byte[8];
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(inBuffer, 8, null, 0, ref done), Throws.Nothing);
+        }
+        [Test]
+        public void TestDecodeNullInputAndOutput()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(null, 0, null, 0, ref done), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestDecodeNoOpen()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(null, 0, null, 0, ref done), Throws.TypeOf<Mpg123.ErrorException>());
+        }
+
+        [Test]
+        public void TestDecodeNeedMore()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] inBuffer = new byte[8];
+            uint done = 0;
+
+            Assert.That(mpg123.Decode(inBuffer, 8, null, 0, ref done), Is.EqualTo(Mpg123.Errors.NEED_MORE));
+        }
+
+        [Test]
+        public void TestDecodeNewFormat()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+            byte[] inBuffer = File.ReadAllBytes(path);
+            uint done = 0;
+
+            Assert.That(mpg123.Decode(inBuffer, (uint)inBuffer.Length, null, 0, ref done), Is.EqualTo(Mpg123.Errors.NEW_FORMAT));
+        }
+
+        [Test]
+        public void TestDecodeDoneBytes()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            string dirName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string path = Path.Combine(dirName, "bensound-epic.mp3");
+            byte[] inBuffer = File.ReadAllBytes(path);
+            uint done = 0;
+
+            mpg123.Decode(inBuffer, (uint)inBuffer.Length, null, 0, ref done);
+
+            byte[] outBuffer = new byte[100];
+
+            while (mpg123.Decode(null, 0, outBuffer, 100, ref done) != Mpg123.Errors.NEED_MORE)
+            {
+                Assert.That(done, Is.EqualTo(100));
+            }
+        }
+
+        [Test]
+        public void TestDecodeInconsistentInputSizeMajor()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] inBuffer = new byte[100];
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(inBuffer, 300, null, 0, ref done), Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void TestDecodeInconsistentInputSizeMinor()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] inBuffer = new byte[100];
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(inBuffer, 50, null, 0, ref done), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestDecodeInconsistentOutputSizeMajor()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] outBuffer = new byte[100];
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(null, 0, outBuffer, 300, ref done), Throws.TypeOf<ArgumentOutOfRangeException>());
+        }
+
+        [Test]
+        public void TestDecodeInconsistentOutputSizeMinor()
+        {
+            Mpg123 mpg123 = new Mpg123();
+
+            mpg123.OpenFeed();
+
+            byte[] outBuffer = new byte[100];
+            uint done = 0;
+
+            Assert.That(() => mpg123.Decode(null, 0, outBuffer, 50, ref done), Throws.Nothing);
         }
 
         #region SEEKS_TESTS
