@@ -221,7 +221,7 @@ namespace Aiv.Mpg123
         /// <param name="rate"></param>
         /// <param name="channels"></param>
         /// <param name="encodings"></param>
-        public Errors Format(long rate, int channels, int encodings)
+        public Errors SetFormat(long rate, int channels, int encodings)
         {
             Errors error = NativeMethods.NativeMpg123Format(this.handle, (IntPtr)rate, channels, encodings);
             if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
