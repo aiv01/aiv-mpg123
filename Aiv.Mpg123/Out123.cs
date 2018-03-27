@@ -265,7 +265,7 @@ namespace Aiv.Mpg123 {
                 throw new Out123.ErrorException(this);
         }
 
-        public ulong Play(long rate, byte[] buffer) {
+        public ulong Play(byte[] buffer) {
             IntPtr bufferPtr = Marshal.AllocHGlobal(Marshal.SizeOf<byte>() * buffer.Length);
             Marshal.Copy(buffer, 0, bufferPtr, buffer.Length);
             UIntPtr size = Out123NativeMethods.Play(handle, bufferPtr, new UIntPtr((ulong)buffer.Length));
