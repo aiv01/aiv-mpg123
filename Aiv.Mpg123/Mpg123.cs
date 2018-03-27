@@ -219,11 +219,12 @@ namespace Aiv.Mpg123
         /// <param name="rate"></param>
         /// <param name="channels"></param>
         /// <param name="encodings"></param>
-        public void Format(long rate, int channels, int encodings)
+        public Errors Format(long rate, int channels, int encodings)
         {
             Errors error = NativeMethods.NativeMpg123Format(this.handle, (IntPtr)rate, channels, encodings);
-            if (error != Errors.OK)
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
                 throw new ErrorException(error);
+            return error;
         }
         public ChannelCount IsFormatSupported(long rate, int encoding)
         {
@@ -236,22 +237,24 @@ namespace Aiv.Mpg123
         /// <param name="rate"></param>
         /// <param name="channels"></param>
         /// <param name="encoding"></param>
-        public void GetFormat(ref long rate, ref int channels, ref int encoding)
+        public Errors GetFormat(ref long rate, ref int channels, ref int encoding)
         {
             IntPtr tempPtr = IntPtr.Zero;
             Errors error = NativeMethods.NativeMpg123GetFormat(this.handle, ref tempPtr, ref channels, ref encoding);
             rate = (long)tempPtr;
-            if (error != Errors.OK)
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
                 throw new ErrorException(error);
+            return error;
         }
-        public void GetFormat(ref long rate, ref int channels, ref int encoding, bool clearFlags)
+        public Errors GetFormat(ref long rate, ref int channels, ref int encoding, bool clearFlags)
         {
             IntPtr tempPtr = IntPtr.Zero;
             int _clearFlags = clearFlags ? 0 : 1;
             Errors error = NativeMethods.NativeMpg123GetFormat2(this.handle, ref tempPtr, ref channels, ref encoding, _clearFlags);
             rate = (long)tempPtr;
-            if (error != Errors.OK)
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
                 throw new ErrorException(error);
+            return error;
         }
 
 
