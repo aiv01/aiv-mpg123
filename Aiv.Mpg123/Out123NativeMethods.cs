@@ -63,5 +63,14 @@ namespace Aiv.Mpg123
         [DllImport(LibraryName, EntryPoint = "out123_open", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Out123.Errors Open(IntPtr handle, IntPtr driver, IntPtr device);
+
+        //API: int out123_start(out123_handle *ao, long rate, int channels, int encoding)
+        [DllImport(LibraryName, EntryPoint = "out123_start", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Out123.Errors Start(IntPtr handle, IntPtr rate, int channels, int encoding);
+
+        //API: size_t out123_play(out123_handle* ao, void* buffer, size_t bytes)
+        [DllImport(LibraryName, EntryPoint = "out123_play", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static UIntPtr Play(IntPtr handle, IntPtr buffer, UIntPtr bytes);
     }
 }
