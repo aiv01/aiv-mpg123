@@ -197,21 +197,23 @@ namespace Aiv.Mpg123
         /// Configure a mpg123 handle to accept no output format at all, use before specifying supported formats with mpg123_format
         /// </summary>
         /// <param name="handle">Can't be null</param>
-        public void FormatNone()
+        public Errors FormatNone()
         {
             Errors error = NativeMethods.NativeMpg123FormatNone(this.handle);
-            if (error != Errors.OK)
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
                 throw new ErrorException(error);
+            return error;
         }
         /// <summary>
         /// Configure mpg123 handle to accept all formats (also any custom rate you may set) – this is default.
         /// </summary>
         /// <param name="handle">Can't be null</param>
-        public void FormatAll()
+        public Errors FormatAll()
         {
             Errors error = NativeMethods.NativeMpg123FormatAll(this.handle);
-            if (error != Errors.OK)
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
                 throw new ErrorException(error);
+            return error;
         }
         /// <summary>
         /// Set the audio format support of a mpg123_handle in detail
