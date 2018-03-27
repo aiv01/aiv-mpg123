@@ -628,11 +628,12 @@ namespace Aiv.Mpg123
                 throw new ErrorException(error);
         }
 
-        public void GetVolume(ref double base_,ref double really,ref double rva_db)
+        public void GetVolume(ref double base_, ref double really, ref double rva_db)
         {
             Errors error = NativeMethods.NativeMpg123GetVolume(handle, ref base_, ref really, ref rva_db);
             if (error != Errors.OK)
                 throw new ErrorException(error);
+        }
                 
         public void SetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, long value = 0, double fvalue = 0)
         {
