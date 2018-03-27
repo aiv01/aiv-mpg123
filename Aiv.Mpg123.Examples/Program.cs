@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+////using System.Text;
 using System.Threading.Tasks;
 
 namespace Aiv.Mpg123.Examples
@@ -14,6 +14,10 @@ namespace Aiv.Mpg123.Examples
             {
                 Console.WriteLine(decoder);
             }
+
+            Out123 out123 = new Out123();
+
+            out123.Open();
 
             Console.ReadLine();
         }
