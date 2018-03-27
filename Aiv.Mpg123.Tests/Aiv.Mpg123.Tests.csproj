@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Out123Test.cs" />
     <Compile Include="Mpg123Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
