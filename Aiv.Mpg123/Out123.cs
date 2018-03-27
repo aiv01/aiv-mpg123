@@ -258,5 +258,22 @@ namespace Aiv.Mpg123 {
             Console.WriteLine(device.ToString());
             */
         }
+
+        public void Start(long rate, int channels, int encoding) {
+            Out123.Errors error = Out123NativeMethods.Start(handle, new IntPtr(rate), channels, encoding);
+            if (error != Out123.Errors.OK)
+                throw new Out123.ErrorException(this);
+        }
+
+        public ulong Play(long rate, byte[] buffer) {
+            IntPtr bufferPtr = Marshal.AllocHGlobal(Marshal.SizeOf<byte>() * buffer.Length);
+            Marshal.Copy(buffer, 0, bufferPtr, buffer.Length);
+            UIntPtr size = Out123NativeMethods.Play(handle, bufferPtr, new UIntPtr((ulong)buffer.Length));
+
+            Marshal.FreeHGlobal(bufferPtr);
+            return size.ToUInt64();
+        }
+
+
     }
 }
