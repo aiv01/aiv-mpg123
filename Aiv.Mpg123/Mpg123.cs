@@ -197,25 +197,21 @@ namespace Aiv.Mpg123
         /// Configure a mpg123 handle to accept no output format at all, use before specifying supported formats with mpg123_format
         /// </summary>
         /// <param name="handle">Can't be null</param>
-        /// <returns>Returns OK on succes</returns>
-        public Errors FormatNone()
+        public void FormatNone()
         {
             Errors error = NativeMethods.NativeMpg123FormatNone(this.handle);
             if (error != Errors.OK)
                 throw new ErrorException(error);
-            return error;
         }
         /// <summary>
         /// Configure mpg123 handle to accept all formats (also any custom rate you may set) – this is default.
         /// </summary>
         /// <param name="handle">Can't be null</param>
-        /// <returns>Returns OK on succes</returns>
-        public Errors FormatAll()
+        public void FormatAll()
         {
             Errors error = NativeMethods.NativeMpg123FormatAll(this.handle);
             if (error != Errors.OK)
                 throw new ErrorException(error);
-            return error;
         }
         /// <summary>
         /// Set the audio format support of a mpg123_handle in detail
@@ -223,13 +219,11 @@ namespace Aiv.Mpg123
         /// <param name="rate"></param>
         /// <param name="channels"></param>
         /// <param name="encodings"></param>
-        /// <returns></returns>
-        public Errors Format(long rate, int channels, int encodings)
+        public void Format(long rate, int channels, int encodings)
         {
             Errors error = NativeMethods.NativeMpg123Format(this.handle, (IntPtr)rate, channels, encodings);
             if (error != Errors.OK)
                 throw new ErrorException(error);
-            return error;
         }
         public ChannelCount IsFormatSupported(long rate, int encoding)
         {
@@ -242,21 +236,22 @@ namespace Aiv.Mpg123
         /// <param name="rate"></param>
         /// <param name="channels"></param>
         /// <param name="encoding"></param>
-        /// <returns></returns>
-        public Errors GetFormat(ref long rate, ref int channels, ref int encoding)
+        public void GetFormat(ref long rate, ref int channels, ref int encoding)
         {
             IntPtr tempPtr = IntPtr.Zero;
             Errors error = NativeMethods.NativeMpg123GetFormat(this.handle, ref tempPtr, ref channels, ref encoding);
             rate = (long)tempPtr;
-            return error;
+            if (error != Errors.OK)
+                throw new ErrorException(error);
         }
-        public Errors GetFormat(ref long rate, ref int channels, ref int encoding, bool clearFlags)
+        public void GetFormat(ref long rate, ref int channels, ref int encoding, bool clearFlags)
         {
             IntPtr tempPtr = IntPtr.Zero;
             int _clearFlags = clearFlags ? 0 : 1;
             Errors error = NativeMethods.NativeMpg123GetFormat2(this.handle, ref tempPtr, ref channels, ref encoding, _clearFlags);
             rate = (long)tempPtr;
-            return error;
+            if (error != Errors.OK)
+                throw new ErrorException(error);
         }
 
 
