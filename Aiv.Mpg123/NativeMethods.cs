@@ -50,7 +50,7 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_read", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
-        internal extern static Mpg123.Errors NativeMpg123Read(IntPtr handle, IntPtr outMemory, UIntPtr outMemSize, UIntPtr done);
+        internal extern static Mpg123.Errors NativeMpg123Read(IntPtr handle, IntPtr outMemory, UIntPtr outMemSize, ref UIntPtr done);
 
         [DllImport(LibraryName, EntryPoint = "mpg123_param", CallingConvention = CallingConvention.Cdecl)]
         internal extern static int NativeMpg123SetParam(IntPtr handle, [MarshalAs(UnmanagedType.I4)] Mpg123.Mpg123Params type, IntPtr value, double fvalue);
@@ -114,5 +114,20 @@ namespace Aiv.Mpg123
 
         [DllImport(LibraryName, EntryPoint = "mpg123_timeframe", CallingConvention = CallingConvention.Cdecl)]
         internal static extern IntPtr NativeMpg123TimeFrame(IntPtr handle, double sec);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decode_frame", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123DecodeFrame(IntPtr handle, ref IntPtr num,  ref IntPtr audio, ref UIntPtr bytes);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_open_feed", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123OpenFeed(IntPtr handle);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_feed", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123Feed(IntPtr handle, IntPtr inBuff, UIntPtr size);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_decode", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern Mpg123.Errors NativeMpg123Decode(IntPtr handle, IntPtr inMemory, UIntPtr inMemorySize, IntPtr outMemory, UIntPtr outMemorySize, ref UIntPtr done);
+
+        [DllImport(LibraryName, EntryPoint = "mpg123_framepos", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr NativeMpg123FramePos(IntPtr handle);
     }
 }

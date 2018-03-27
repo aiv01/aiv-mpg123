@@ -356,6 +356,11 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
+        /// <summary>
+        /// Open and prepare to decode the specified file.
+        /// </summary>
+        /// <param name="path">path of the file to open</param>
+        /// <returns></returns>
         public void Open(string path)
         {
             IntPtr pathPtr = IntPtr.Zero;
@@ -371,6 +376,10 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
+        /// <summary>
+        /// Closes the source, if libmpg123 opened it.
+        /// </summary>
+        /// <returns></returns>
         public void Close()
         {
             Errors error = NativeMethods.NativeMpg123Close(handle);
@@ -378,10 +387,173 @@ namespace Aiv.Mpg123
                 throw new ErrorException((Errors)error);
         }
 
-        //public void Read(byte[] buffer, ulong offset)
-        //{
-        //    NativeMethods.NativeMpg123Read(handle, )
-        //}
+        /// <summary>
+        /// Read from stream and decode up to the length of outMemory bytes.
+        /// </summary>
+        /// <param name="outMemory">memory buffer to write to</param>
+        /// <param name="done">integer to store the number of actually decoded bytes to</param>
+        /// <returns></returns>
+        public Errors Read(byte[] outMemory, ref uint done)
+        {
+            IntPtr outMemoryPtr = IntPtr.Zero;
+            UIntPtr outMemSizePtr = new UIntPtr((uint)outMemory.Length);
+            UIntPtr donePtr = new UIntPtr(done);
+
+            outMemoryPtr = Marshal.AllocHGlobal(outMemory.Length);
+            if (outMemoryPtr != IntPtr.Zero)
+                Marshal.Copy(outMemory, 0, outMemoryPtr, outMemory.Length);
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123Read(handle, outMemoryPtr, outMemSizePtr, ref donePtr);
+
+            if (outMemoryPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(outMemoryPtr, outMemory, 0, outMemory.Length);
+                Marshal.FreeHGlobal(outMemoryPtr);
+            }
+
+            done = donePtr.ToUInt32();
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException((Errors)error);
+
+            return error;
+        }
+
+        /// <summary>
+        /// Decode next MPEG frame to internal buffer or read a frame and return after setting a new format.
+        /// </summary>
+        /// <param name="num">current frame offset gets stored there</param>
+        /// <param name="audio">reference set to a buffer to read the decoded audio from.</param>
+        /// <param name="bytes">number of output bytes ready in the buffer</param>
+        /// <returns></returns>
+        public Errors DecodeFrame(ref int num, ref byte[] audio, ref uint bytes)
+        {
+            IntPtr numPtr       = IntPtr.Zero;
+            UIntPtr bytesPtr    = UIntPtr.Zero;
+            IntPtr audioPtr     = IntPtr.Zero;
+
+            numPtr = new IntPtr(num);
+            bytesPtr = new UIntPtr(bytes);
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123DecodeFrame(handle, ref numPtr, ref audioPtr, ref bytesPtr);
+
+            num = numPtr.ToInt32();
+            bytes = bytesPtr.ToUInt32();
+            audio = new byte[bytes];
+
+            if (audioPtr != IntPtr.Zero)
+                Marshal.Copy(audioPtr, audio, 0, (int)bytes);
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException((Errors)error);
+
+            return error;
+        }
+
+        /// <summary>
+        /// Open a new bitstream and prepare for direct feeding This works together with Decode(); 
+        /// you are responsible for reading and feeding the input bitstream.
+        /// </summary>
+        public void OpenFeed()
+        {
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123OpenFeed(handle);
+
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+        }
+
+        /// <summary>
+        ///Feed data for a stream that has been opened with OpenFeed(). 
+        ///It's give and take: You provide the bytestream, mpg123 gives you the decoded samples.
+        /// </summary>
+        /// <param name="inBuff">input buffer</param>
+        public Errors Feed(byte[] inBuff)
+        {
+            IntPtr inBuffPtr = IntPtr.Zero;
+            UIntPtr sizePtr = UIntPtr.Zero;
+
+            inBuffPtr = Marshal.AllocHGlobal(inBuff.Length);
+            sizePtr = new UIntPtr((uint)inBuff.Length);
+
+            if (inBuffPtr != IntPtr.Zero)
+            {
+                Marshal.Copy(inBuff, 0, inBuffPtr, inBuff.Length);
+            }
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123Feed(handle, inBuffPtr, sizePtr);
+
+            if (inBuffPtr != IntPtr.Zero)
+                Marshal.FreeHGlobal(inBuffPtr);
+
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+
+            return error;
+        }
+
+        /// <summary>
+        ///Decode MPEG Audio from inMemory to outMemory. 
+        /// </summary>
+        /// <param name="inMemory">input buffer</param>
+        /// <param name="inMemSize">number of input bytes</param>
+        /// <param name="outMemory">output buffer</param>
+        /// <param name="outMemSize">maximum number of output bytes</param>
+        /// <param name="done">integer to store the number of actually decoded bytes to</param>
+        public Errors Decode(byte[] inMemory, uint inMemSize, byte[] outMemory, uint outMemSize, ref uint done)
+        {
+            IntPtr inMemoryPtr          = IntPtr.Zero;
+            UIntPtr inMemorySizePtr     = UIntPtr.Zero;
+            IntPtr outMemoryPtr         = IntPtr.Zero;
+            UIntPtr outMemorySizePtr    = UIntPtr.Zero;
+            UIntPtr donePtr             = UIntPtr.Zero;
+
+            inMemorySizePtr = new UIntPtr(inMemSize);
+            outMemorySizePtr = new UIntPtr(outMemSize);
+            donePtr = new UIntPtr(done);
+
+            inMemoryPtr = Marshal.AllocHGlobal((int)inMemSize);
+            outMemoryPtr = Marshal.AllocHGlobal((int)outMemSize);
+
+            if (inMemoryPtr != IntPtr.Zero && inMemory != null)
+                Marshal.Copy(inMemory, 0, inMemoryPtr, (int)inMemSize);
+
+            Errors error = Errors.OK;
+            error = NativeMethods.NativeMpg123Decode(handle, inMemoryPtr, inMemorySizePtr, outMemoryPtr, outMemorySizePtr, ref donePtr);
+
+            done = donePtr.ToUInt32();
+
+            if(inMemoryPtr != IntPtr.Zero)
+                Marshal.FreeHGlobal(inMemoryPtr);
+
+            if (outMemoryPtr != IntPtr.Zero)
+            {
+                if(outMemory != null)
+                    Marshal.Copy(outMemoryPtr, outMemory, 0, (int)outMemSize);
+
+                Marshal.FreeHGlobal(outMemoryPtr);
+            }
+
+            if (error != Errors.OK && error != Errors.NEW_FORMAT && error != Errors.NEED_MORE && error != Errors.DONE)
+                throw new ErrorException(error);
+
+            return error;
+        }
+
+        /// <summary>
+        /// Get the input position (byte offset in stream) of the last parsed frame. 
+        /// This can be used for external seek index building, for example. 
+        /// It just returns the internally stored offset, regardless of validity – you ensure that a valid frame has been parsed before!
+        /// </summary>
+        /// <returns></returns>
+        public int FramePos()
+        {
+            IntPtr ret = NativeMethods.NativeMpg123FramePos(handle);
+            return ret.ToInt32();
+        }
 
         protected bool disposed;
 
