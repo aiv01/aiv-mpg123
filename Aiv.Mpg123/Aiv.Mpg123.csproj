@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mpg123.cs" />
+    <Compile Include="Out123NativeMethods.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="Out123.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
