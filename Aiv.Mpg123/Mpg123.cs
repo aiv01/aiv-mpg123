@@ -95,6 +95,13 @@ namespace Aiv.Mpg123
             MPG123_FEATURE_EQUALIZER, MPG123_FEATURE_MOREINFO
         }
 
+        public enum Channels
+        {
+            LEFT = 1,
+            RIGHT,
+            LR
+        }
+
         static private bool libraryInitialized;
         static public bool IsLibraryInitialized
         {
@@ -587,6 +594,46 @@ namespace Aiv.Mpg123
             Dispose(false);
         }
 
+        public void Eq(Channels channel, int band, double val)
+        {
+            Errors error = NativeMethods.NativeMpg123Eq(handle, channel, band, val);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+        }
+
+        public double GetEq(Channels channel, int band)
+        {
+            double ret = NativeMethods.NativeMpg123GetEq(handle, channel, band);
+            return ret;
+        }
+
+        public void ResetEq()
+        {
+            Errors error = NativeMethods.NativeMpg123ResetEq(handle);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+        }
+
+        public void Volume(double vol)
+        {
+            Errors error = NativeMethods.NativeMpg123Volume(handle,vol);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+        }
+
+        public void VolumeChange(double change)
+        {
+            Errors error = NativeMethods.NativeMpg123VolumeChange(handle, change);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+        }
+
+        public void GetVolume(ref double base_,ref double really,ref double rva_db)
+        {
+            Errors error = NativeMethods.NativeMpg123GetVolume(handle, ref base_, ref really, ref rva_db);
+            if (error != Errors.OK)
+                throw new ErrorException(error);
+                
         public void SetParam([MarshalAs(UnmanagedType.I4)] Mpg123Params type, long value = 0, double fvalue = 0)
         {
             int setParam = NativeMethods.NativeMpg123SetParam(handle, type, (IntPtr)value, fvalue);

@@ -129,6 +129,133 @@ namespace Aiv.Mpg123.Tests
         }
 
         [Test]
+        public void TestSetEqualizer()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(()=>mpg123.Eq(Mpg123.Channels.LEFT, 10, 10),Throws.Nothing);
+        }
+        [Test]
+        public void TestSetEqualizerRedLight()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            int ErrorValue = 1000;
+            Assert.That(() => mpg123.Eq(Mpg123.Channels.LEFT, ErrorValue, 20), Throws.TypeOf<Mpg123.ErrorException>());
+        }
+        [Test]
+        public void TestGetEqualizer()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Eq(Mpg123.Channels.LR, 20, 20);
+            double aspectedValue = 20;
+            Assert.That(mpg123.GetEq(Mpg123.Channels.LR, 20), Is.EqualTo(aspectedValue));
+        }
+        [Test]
+        public void TestGetEqualizerRedLight()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Eq(Mpg123.Channels.LR, 20, 30);
+            double value = 20;
+            Assert.That(mpg123.GetEq(Mpg123.Channels.LR, 20), Is.Not.EqualTo(value));
+        }
+        [Test]
+        public void TestResetEqualizer()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(() => mpg123.ResetEq(), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestResetEqualizerRedLight()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Dispose();
+            Assert.That(() => mpg123.ResetEq(), Throws.TypeOf<Mpg123.ErrorException>());
+        }
+
+        [Test]
+        public void TestVolume()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            Assert.That(() => mpg123.Volume(20), Throws.Nothing);
+
+            double base_ = 0;
+            double really = 0;
+            double rva_db = 0;
+
+            mpg123.GetVolume(ref base_, ref really, ref rva_db);
+            Assert.That(base_, Is.EqualTo(20));
+            Assert.That(really, Is.EqualTo(20));
+        }
+
+        [Test]
+        public void TestVolumeRedLight()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            double base_ = 0;
+            double really = 0;
+            double rva_db = 0;
+            Assert.That(() => mpg123.Volume(20), Throws.Nothing);
+            mpg123.GetVolume(ref base_, ref really, ref rva_db);
+            Assert.That(base_, Is.Not.EqualTo(0));
+        }
+        [Test]
+        public void TestVolumeChange()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Volume(20);
+
+            Assert.That(() => mpg123.VolumeChange(10), Throws.Nothing);
+
+            double expectedVolume = 30;
+
+            double base_ = 0;
+            double really = 0;
+            double rva_db = 0;
+            mpg123.GetVolume(ref base_, ref really, ref rva_db);
+
+            Assert.That(base_, Is.EqualTo(expectedVolume));
+        }
+
+        [Test]
+        public void TestVolumeChangeRedLight()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Volume(50);
+            mpg123.VolumeChange(25);
+
+            double base_ = 0;
+            double really = 0;
+            double rva_db = 0;
+            mpg123.GetVolume(ref base_, ref really, ref rva_db);
+
+            Assert.That(base_, Is.Not.EqualTo(50));
+        }
+
+        [Test]
+        public void TestGetVolume()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Volume(50);
+            double base_ = 0;
+            double really = 0;
+            double rva_db = 0;
+            Assert.That(() => mpg123.GetVolume(ref base_, ref really, ref rva_db), Throws.Nothing);
+            Assert.That(base_, Is.EqualTo(50));
+            Assert.That(really, Is.EqualTo(50));
+        }
+
+        [Test]
+        public void TestGetVolumeRedLight()
+        {
+            Mpg123 mpg123 = new Mpg123();
+            mpg123.Volume(50);
+            double base_ = 20;
+            double really = 20;
+            double rva_db = 0;
+            Assert.That(() => mpg123.GetVolume(ref base_, ref really, ref rva_db), Throws.Nothing);
+            Assert.That(base_, Is.Not.EqualTo(20));
+            Assert.That(really, Is.Not.EqualTo(20));
+        }
 
         public void TestOpenPathNull()
         {
