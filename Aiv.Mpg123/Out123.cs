@@ -72,7 +72,7 @@ namespace Aiv.Mpg123 {
             System.Environment.SetEnvironmentVariable("MPG123_MODDIR", pluginFolder);
             handle = Out123NativeMethods.New();
             if (handle == IntPtr.Zero) {
-                System.Environment.SetEnvironmentVariable("MPG123_BINDIR", ""); //remove env variable
+                System.Environment.SetEnvironmentVariable("MPG123_MODDIR", ""); //remove env variable
                 throw new Out123.ErrorException("Unable to initialize lib Out123");
             }    
         }
