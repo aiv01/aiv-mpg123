@@ -42,6 +42,7 @@ namespace Aiv.Mpg123
         //API: int out123_getparam (out123_handle *ao, enum out123_parms code, long *ret_value, double *ret_fvalue, char **ret_svalue)
         [DllImport(LibraryName, EntryPoint = "out123_getparam", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
+        //internal extern static Out123.Errors GetParam(IntPtr handle, [MarshalAs(UnmanagedType.I4)] Out123.Params code, ref long value, ref double fvalue, IntPtr svalue);
         internal extern static Out123.Errors GetParam(IntPtr handle, [MarshalAs(UnmanagedType.I4)] Out123.Params code, ref long value, ref double fvalue, IntPtr svalue);
 
         //API: int out123_param_from(out123_handle *ao, out123_handle *from_ao)
@@ -64,13 +65,68 @@ namespace Aiv.Mpg123
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Out123.Errors Open(IntPtr handle, IntPtr driver, IntPtr device);
 
+        //API: void out123_close(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_close", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void Close(IntPtr handle);
+
+        //API: int out123_encodings(out123_handle *ao, long rate, int channels)
+        [DllImport(LibraryName, EntryPoint = "out123_encodings", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int Encodings(IntPtr handle, IntPtr rate, int channels);
+
+        //API: int out123_encsize(int encoding)
+        [DllImport(LibraryName, EntryPoint = "out123_encsize", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static int Encsize(int encoding);
+
+        //API: int out123_formats(out123_handle *ao, const long *rates, int ratecount, int minchannels, int maxchannels, struct mpg123_fmt **fmtlist)
+
+        //API: int out123_enc_list(int** enclist)
+
+        //API: int out123_enc_byname(const char *name)
+
+        //API: const char* out123_enc_name(int encoding)
+
+        //API: const char* out123_enc_longname(int encoding)
+
         //API: int out123_start(out123_handle *ao, long rate, int channels, int encoding)
         [DllImport(LibraryName, EntryPoint = "out123_start", CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I4)]
         internal extern static Out123.Errors Start(IntPtr handle, IntPtr rate, int channels, int encoding);
 
+        //API: void out123_pause(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_pause", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void Pause(IntPtr handle);
+
+        //API: void out123_continue(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_continue", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void Continue(IntPtr handle);
+
+        //API: void out123_stop(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_stop", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void Stop(IntPtr handle);
+
         //API: size_t out123_play(out123_handle* ao, void* buffer, size_t bytes)
         [DllImport(LibraryName, EntryPoint = "out123_play", CallingConvention = CallingConvention.Cdecl)]
         internal extern static UIntPtr Play(IntPtr handle, IntPtr buffer, UIntPtr bytes);
+
+        //API: void out123_drop(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_drop", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void Drop(IntPtr handle);
+
+        //API: void out123_drain(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_drain", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void Drain(IntPtr handle);
+
+        //API: void out123_ndrain(out123_handle *ao, size_t bytes)
+        [DllImport(LibraryName, EntryPoint = "out123_ndrain", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static void NDrain(IntPtr handle, UIntPtr bytes);
+
+        //API: size_t out123_buffered(out123_handle *ao)
+        [DllImport(LibraryName, EntryPoint = "out123_buffered", CallingConvention = CallingConvention.Cdecl)]
+        internal extern static UIntPtr Buffered(IntPtr handle);
+
+        //API: int out123_getformat(out123_handle* ao, long* rate, int* channels, int* encoding, int* framesize)
+        [DllImport(LibraryName, EntryPoint = "out123_getformat", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I4)]
+        internal extern static Out123.Errors GetFormat(IntPtr handle, IntPtr rate, IntPtr channels, IntPtr encoding, IntPtr framesize);
     }
 }

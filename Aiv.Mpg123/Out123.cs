@@ -52,15 +52,46 @@ namespace Aiv.Mpg123 {
         };
 
         public class Driver {
-            public String name { get; private set; }
-            public String desc { get; private set; }
+            public String Name { get; private set; }
+            public String Desc { get; private set; }
             public Driver(String aName, String aDesc) {
-                name = aName;
-                desc = aDesc;
+                Name = aName;
+                Desc = aDesc;
             }
 
             public override string ToString() {
-                return "Driver {" + name + ", " + desc + "}";
+                return "Driver {" + Name + ", " + Desc + "}";
+            }
+        }
+
+        public class DriverInfo {
+            public String Driver { get; private set; }
+            public String Device { get; private set; }
+            public DriverInfo(String aDriver, String aDevice) {
+                Driver = aDriver;
+                Device = aDevice;
+            }
+
+            public override string ToString() {
+                return "DriverInfo {" + Driver + ", " + Device + "}";
+            }
+        }
+
+        public class Format {
+            public long Rate { get; private set; }
+            public int Channels { get; private set; }
+            public int Encoding { get; private set; }
+            public int Framesize { get; private set; }
+
+            public Format(long aRate, int aChannels, int anEncoding, int aFramesize) {
+                Rate = aRate;
+                Channels = aChannels;
+                Encoding = anEncoding;
+                Framesize = aFramesize;
+            }
+
+            public override string ToString() {
+                return "Format {" + Rate + ", " + Channels + ", " + Encoding + ", "+ Framesize +"}";
             }
         }
 
@@ -104,7 +135,6 @@ namespace Aiv.Mpg123 {
 
         public string LastErrorString() {
             IntPtr errorPtr = Out123NativeMethods.StrError(handle);
-            Console.WriteLine("2: " + handle.ToInt64());
             return Marshal.PtrToStringAnsi(errorPtr);
         }
 
@@ -153,9 +183,8 @@ namespace Aiv.Mpg123 {
         public double GetParamFloat(Out123.Params aParam) {
             long null_value = 0; // not interested in int value because want the doule value.
             double result = 0;
-            IntPtr null_sValue = IntPtr.Zero;
+            IntPtr null_sValue = IntPtr.Zero; // not interested in sValue because want the doule value.
             Out123.Errors error = Out123NativeMethods.GetParam(handle, aParam, ref null_value, ref result, null_sValue);
-            Console.WriteLine(null_value);
             if (error != Out123.Errors.OK)
                 throw new Out123.ErrorException(this);
             return result;
@@ -191,20 +220,15 @@ namespace Aiv.Mpg123 {
             IntPtr descsPtr = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
 
             Out123.Errors error = Out123NativeMethods.Drivers(handle, namesPtr, descsPtr);
-            Console.WriteLine("1: " + handle.ToInt64());
             if (error != Out123.Errors.OK) {
                 Marshal.FreeHGlobal(namesPtr);
                 Marshal.FreeHGlobal(descsPtr);
-                Console.WriteLine(error);
-                Console.WriteLine("[" + LastErrorString() + "]");
-                //throw new Out123.ErrorException(this);
-                yield break;
+                throw new Out123.ErrorException(this);
             }
 
             IntPtr namesPtrDeref = Marshal.ReadIntPtr(namesPtr);
             IntPtr descsPtrDeref = Marshal.ReadIntPtr(descsPtr);
             int offset = 0;
-
             while (true) {
                 IntPtr namePtr = Marshal.ReadIntPtr(namesPtrDeref, offset);
                 IntPtr descPtr = Marshal.ReadIntPtr(descsPtrDeref, offset);
@@ -239,24 +263,26 @@ namespace Aiv.Mpg123 {
                 throw new Out123.ErrorException(this);
         }
 
-        public void DriverInfo() {
+        public Out123.DriverInfo GetDriverInfo() {
             IntPtr driverPtr = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
             IntPtr devicePtr = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
 
             Out123.Errors error = Out123NativeMethods.DriverInfo(handle, driverPtr, devicePtr);
-            Console.WriteLine(error);
-            Console.WriteLine(LastErrorCode());
-            Console.WriteLine(LastErrorString());
 
-            if (error != Out123.Errors.OK)
+            if (error != Out123.Errors.OK) {
+                Marshal.FreeHGlobal(driverPtr);
+                Marshal.FreeHGlobal(devicePtr);
                 throw new Out123.ErrorException(error);
-            /*
+            }
+            
             IntPtr driver = Marshal.ReadIntPtr(driverPtr);
             IntPtr device = Marshal.ReadIntPtr(devicePtr);
 
-            Console.WriteLine(driver.ToString());
-            Console.WriteLine(device.ToString());
-            */
+            Out123.DriverInfo result = new Out123.DriverInfo(Marshal.PtrToStringAnsi(driver), Marshal.PtrToStringAnsi(device));
+            Marshal.FreeHGlobal(driverPtr);
+            Marshal.FreeHGlobal(devicePtr);
+
+            return result;
         }
 
         public void Start(long rate, int channels, int encoding) {
@@ -274,6 +300,68 @@ namespace Aiv.Mpg123 {
             return size.ToUInt64();
         }
 
+        public void Close() {
+            Out123NativeMethods.Close(handle);
+        }
 
+        public int EncodingsFor(long rate, int channels) {
+            int result = Out123NativeMethods.Encodings(handle, new IntPtr(rate), channels);
+            if (result == -1) {
+                throw new Out123.ErrorException(this);
+            }
+            return result;
+        }
+
+        public int EncodingSize(int encoding) {
+            return Out123NativeMethods.Encsize(encoding);
+        }
+
+        public void Pause() {
+            Out123NativeMethods.Pause(handle);
+        }
+
+        public void Continue() {
+            Out123NativeMethods.Continue(handle);
+        }
+
+        public void Stop() {
+            Out123NativeMethods.Stop(handle);
+        }
+
+        public void Drop() {
+            Out123NativeMethods.Drop(handle);
+        }
+
+        public void Drain(ulong nummberOfBytesToDrain = 0) {
+            if (nummberOfBytesToDrain == 0) Out123NativeMethods.Drain(handle);
+            else Out123NativeMethods.NDrain(handle, new UIntPtr(nummberOfBytesToDrain));
+        }
+
+        public ulong Buffered() {
+            return Out123NativeMethods.Buffered(handle).ToUInt64();
+        }
+
+        public Out123.Format GetFormat() {
+            IntPtr rate = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
+            IntPtr channels = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
+            IntPtr encoding = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
+            IntPtr framesize = Marshal.AllocHGlobal(Marshal.SizeOf<IntPtr>());
+            Out123.Errors error = Out123NativeMethods.GetFormat(handle, rate, channels, encoding, framesize);
+            if (error != Out123.Errors.OK) {
+                Marshal.FreeHGlobal(rate);
+                Marshal.FreeHGlobal(channels);
+                Marshal.FreeHGlobal(encoding);
+                Marshal.FreeHGlobal(framesize);
+                throw new Out123.ErrorException(this);
+            }
+
+            Out123.Format result = new Out123.Format(rate.ToInt64(), channels.ToInt32(), encoding.ToInt32(), framesize.ToInt32());
+            Marshal.FreeHGlobal(rate);
+            Marshal.FreeHGlobal(channels);
+            Marshal.FreeHGlobal(encoding);
+            Marshal.FreeHGlobal(framesize);
+            return result;
+        }
     }
+
 }

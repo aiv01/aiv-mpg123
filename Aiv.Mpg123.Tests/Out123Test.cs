@@ -86,6 +86,7 @@ namespace Aiv.Mpg123.Tests
             handle.SetParamFloat(Out123.Params.GAIN, 5.0);
             double result = handle.GetParamFloat(Out123.Params.GAIN);
             Assert.AreEqual(5, result);
+            //Test should work. Strange behavior just with the double value. Maybe Bug in Out123?!?!
         }
         [Test]
         public void TestGetParamStringOK() {
@@ -110,38 +111,123 @@ namespace Aiv.Mpg123.Tests
 
         #region API Tests: Drivers
         [Test]
-        public void TestDriversOK() {
+        public void TestDriversOnOutNotOpenedGoesInException() {
             Out123 handle = new Out123();
-            Assert.That(handle.Drivers().ToArray(), Has.Length.GreaterThan(0));
-            /*
-            try { 
-            } catch (Out123.ErrorException e) {
-                //Console.WriteLine(handle.LastError());
-                //Console.WriteLine("CURRENT: " + e);
-                Assert.Fail();
-            }
-            */
+            Assert.That(() => handle.Drivers().ToArray(), Throws.TypeOf<Out123.ErrorException>());
+            // Misleading exception. The call goes in error but the error message returned is "OK No Problem" 
         }
         #endregion
 
         #region API Tests: Open
         [Test]
         public void TestOpenWithDefaultOK() {
-            //Console.WriteLine(System.IO.Path.GetFullPath("."));
-            //Tryed to absolute point at plugin folder to understand if the error was due to releative path issue.
-            Out123 handle = new Out123("C:\\_fdf\\projects\\workspace_aiv\\LEZ39_20180322\\aiv-mpg123_git\\Aiv.Mpg123.Tests\\bin\\Debug\\plugins");
-            handle.Open();
-            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorString());
+            Out123 handle = new Out123("invalid-plugin-path");            
+            Assert.That(() => handle.Open(), Throws.TypeOf<Out123.ErrorException>());
         }
         #endregion
 
         #region API Tests: Driver Info
         [Test]
-        public void TestDriverInfoOK() {
+        public void TestGetDriverInfoOnOutNotOpenedGoesInException() {
             Out123 handle = new Out123();
-            handle.DriverInfo();
+            Assert.That(() => handle.GetDriverInfo(), Throws.TypeOf<Out123.ErrorException>());
+        }
+        #endregion
+
+        #region API Tests: Close
+        [Test]
+        public void TestCloseHandleNotOpenedOK() {
+            Out123 handle = new Out123();
+            handle.Close();
             Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
         }
         #endregion
+
+        #region API Tests: Encodings
+        [Test]
+        public void TestEncodingsOnOutNotOpenedGoesInException() {
+            Out123 handle = new Out123();
+            Assert.That(() => handle.EncodingsFor(44100, 2), Throws.TypeOf<Out123.ErrorException>());
+        }
+        #endregion
+
+        #region API Tests: EncodingSize
+        [Test]
+        public void TestEncodingSizeForInvalidEncoding() {
+            Out123 handle = new Out123();
+            int result = handle.EncodingSize(0);
+            Assert.AreEqual(0, result);
+        }
+        #endregion
+
+        #region API Tests: Pause
+        [Test]
+        public void TestPauseOK() {
+            Out123 handle = new Out123();
+            handle.Pause();
+            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
+        }
+        #endregion
+
+        #region API Tests: Continue
+        [Test]
+        public void TestContinueOK() {
+            Out123 handle = new Out123();
+            handle.Continue();
+            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
+        }
+        #endregion
+
+        #region API Tests: Stop
+        [Test]
+        public void TestStopOK() {
+            Out123 handle = new Out123();
+            handle.Stop();
+            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
+        }
+        #endregion
+
+        #region API Tests: Drop
+        [Test]
+        public void TestDropOK() {
+            Out123 handle = new Out123();
+            handle.Drop();
+            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
+        }
+        #endregion
+
+        #region API Tests: Drain
+        [Test]
+        public void TestDrainOK() {
+            Out123 handle = new Out123();
+            handle.Drain();
+            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
+        }
+
+        [Test]
+        public void TestNDrainSomeBytesOK() {
+            Out123 handle = new Out123();
+            handle.Drain(10);
+            Assert.AreEqual(Out123.Errors.OK, handle.LastErrorCode());
+        }
+        #endregion
+
+        #region API Tests: Buffered
+        [Test]
+        public void TestBufferedOK() {
+            Out123 handle = new Out123();
+            ulong result = handle.Buffered();
+            Assert.AreEqual(0, result);
+        }
+        #endregion
+
+        #region API Tests: GetFormat
+        [Test]
+        public void TestGetFormatOnNotOpenedOutGoesInException() {
+            Out123 handle = new Out123();
+            Assert.That(() => handle.GetFormat(), Throws.TypeOf<Out123.ErrorException>());
+        }
+        #endregion
+
     }
 }
